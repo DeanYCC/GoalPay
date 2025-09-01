@@ -17,8 +17,10 @@ import reportRoutes from './routes/reports.js';
 import { authenticateToken } from './middleware/auth.js';
 import { errorHandler } from './middleware/errorHandler.js';
 
-// Import database connection
+// Import database connection and models
 import { sequelize } from './config/database.js';
+import './models/index.js';
+import './config/passport.js';
 
 // Load environment variables
 dotenv.config();

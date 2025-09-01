@@ -1,233 +1,275 @@
-# 🎯 GoalPay - 智能薪資管理系統
+# GoalPay - Financial Assistant App for Salary Analysis
 
-GoalPay 是一個專為日本工作者設計的薪資分析應用程式，支援多語言（繁體中文、英文、日文）和智能薪資單處理。
+GoalPay is a comprehensive financial assistant application designed for salary analysis, specifically targeting workers in Japan. The app supports multiple languages (Japanese, English, and Traditional Chinese) and provides detailed insights into salary trends, deductions, and financial planning.
 
-## ✨ 核心功能
+## 🚀 Features
 
-### 🚀 MVP 功能
-- **Google OAuth 登入**：安全的身份驗證
-- **用戶設定管理**：公司資訊、語言、貨幣、主題
-- **薪資單上傳/手動輸入**：支援英文和日文薪資單
-- **薪資詞典**：多語言薪資項目定義和自訂詞彙
-- **儀表板和報表**：年度統計、月度趨勢、稅金分析
+### Core Features (MVP)
+- **Google OAuth Authentication** - Secure login with Google accounts
+- **Multi-language Support** - Japanese (JP), English (EN), Traditional Chinese (ZH)
+- **User Account Management** - Company info, language preferences, currency settings, theme options
+- **Payroll Slip Management** - Upload and manually input payroll data
+- **Payroll Terms Dictionary** - Comprehensive database of payroll items with multi-language support
+- **Dashboard & Analytics** - Visual charts and reports for salary analysis
+- **Export Functionality** - PDF and CSV export with customizable options
 
-### 🔮 未來功能
-- 薪資系統 API 整合
-- 儲蓄目標追蹤
-- 產業級薪資成長比較
-- AI 驅動的財務建議
+### Advanced Features
+- **Salary Trend Analysis** - Monthly and yearly comparisons
+- **Deduction Tracking** - Comprehensive breakdown of all deductions
+- **Custom Payroll Terms** - User-defined payroll item definitions
+- **Multi-currency Support** - JPY (default), USD, TWD
+- **Responsive Design** - Works seamlessly on desktop and mobile devices
 
-## 🛠 技術架構
+## 🛠 Tech Stack
 
-### 前端 (Frontend)
-- **React 18** + **TypeScript**
-- **Tailwind CSS** - 現代化 UI 設計
-- **React Router** - 單頁應用路由
-- **React i18next** - 國際化支援
-- **Recharts** - 數據視覺化
-- **Lucide React** - 圖標庫
+### Backend
+- **Node.js** with Express.js framework
+- **PostgreSQL** database with Sequelize ORM
+- **Google OAuth 2.0** for authentication
+- **JWT** for session management
+- **jsPDF** for PDF generation
+- **csv-writer** for CSV export
+- **Multer** for file uploads
 
-### 後端 (Backend)
-- **Node.js** + **Express.js**
-- **PostgreSQL** - 主要資料庫
-- **Sequelize** - ORM
-- **Passport.js** - Google OAuth 認證
-- **JWT** - 身份驗證
-- **Multer** - 檔案上傳處理
+### Frontend
+- **React 19** with TypeScript
+- **Tailwind CSS** for styling
+- **Recharts** for data visualization
+- **React Router** for navigation
+- **i18next** for internationalization
+- **Lucide React** for icons
 
-### 資料庫 (Database)
-- **PostgreSQL** 資料庫結構
-- 用戶管理、薪資單、薪資詞典
-- 多語言支援和自訂詞彙
+## 📋 Prerequisites
 
-## 🚀 快速開始
+- Node.js 18+ 
+- PostgreSQL 12+
+- Google OAuth 2.0 credentials
+- npm or yarn package manager
 
-### 前置需求
-- Node.js 18+
-- PostgreSQL 14+
-- npm 或 yarn
+## 🚀 Quick Start
 
-### 1. 克隆專案
+### 1. Clone the Repository
 ```bash
 git clone <repository-url>
 cd GoalPay
 ```
 
-### 2. 前端設定
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### 3. 後端設定
+### 2. Backend Setup
 ```bash
 cd backend
-npm install
-cp .env.example .env
-# 編輯 .env 檔案設定資料庫連線和 Google OAuth
-npm run dev
-```
 
-### 4. 資料庫設定
-```bash
-# 建立 PostgreSQL 資料庫
+# Install dependencies
+npm install
+
+# Copy environment file
+cp env.example .env
+
+# Edit .env file with your configuration
+# Set up database credentials, Google OAuth, and JWT secret
+
+# Create PostgreSQL database
 createdb goalpay
 
-# 執行資料庫結構
-psql -d goalpay -f database/schema.sql
+# Run database migrations
+psql -d goalpay -f ../database/schema.sql
+
+# Start the server
+npm run dev
 ```
 
-### 5. 環境變數設定
+### 3. Frontend Setup
 ```bash
-# backend/.env
-NODE_ENV=development
-PORT=5000
-DATABASE_URL=postgresql://username:password@localhost:5432/goalpay
+cd frontend
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+### 4. Environment Configuration
+
+Create a `.env` file in the backend directory:
+
+```env
+# Database Configuration
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=goalpay
+DB_USER=postgres
+DB_PASSWORD=your_password
+
+# JWT Configuration
+JWT_SECRET=your-super-secret-jwt-key-here
+
+# Google OAuth Configuration
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-JWT_SECRET=your_jwt_secret
+GOOGLE_CALLBACK_URL=http://localhost:5000/api/auth/google/callback
+
+# Frontend URL
 FRONTEND_URL=http://localhost:3000
+
+# Server Configuration
+PORT=5000
+NODE_ENV=development
 ```
 
-## 📁 專案結構
+## 🔧 Google OAuth Setup
 
-```
-GoalPay/
-├── frontend/                 # React 前端應用
-│   ├── src/
-│   │   ├── components/      # 可重用組件
-│   │   ├── pages/          # 頁面組件
-│   │   ├── contexts/       # React Context
-│   │   ├── hooks/          # 自訂 Hooks
-│   │   ├── i18n/           # 國際化設定
-│   │   └── types/          # TypeScript 類型定義
-│   ├── public/             # 靜態資源
-│   └── package.json
-├── backend/                 # Node.js 後端 API
-│   ├── src/
-│   │   ├── routes/         # API 路由
-│   │   ├── controllers/    # 控制器邏輯
-│   │   ├── models/         # 資料庫模型
-│   │   ├── middleware/     # 中間件
-│   │   ├── config/         # 設定檔案
-│   │   └── utils/          # 工具函數
-│   └── package.json
-├── database/                # 資料庫相關
-│   └── schema.sql          # PostgreSQL 結構
-└── docs/                    # 專案文件
-```
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project or select existing one
+3. Enable Google+ API
+4. Go to Credentials → Create Credentials → OAuth 2.0 Client ID
+5. Set authorized redirect URIs:
+   - `http://localhost:5000/api/auth/google/callback` (development)
+   - `https://yourdomain.com/api/auth/google/callback` (production)
+6. Copy Client ID and Client Secret to your `.env` file
 
-## 🌍 多語言支援
+## 📊 Database Schema
 
-### 支援語言
-- **繁體中文 (zh)** - 預設語言
-- **英文 (en)** - 國際化支援
-- **日文 (jp)** - 日本本地化
+The application uses the following main tables:
+- `users` - User accounts and preferences
+- `companies` - Company information
+- `payroll_terms` - Payroll item definitions
+- `payroll_slips` - Payroll slip records
+- `payroll_items` - Individual payroll line items
 
-### 薪資詞典範例
-```json
-{
-  "INCOME_TAX": {
-    "en": "Income Tax",
-    "jp": "所得税",
-    "zh": "所得稅",
-    "description_en": "Government tax on income",
-    "description_jp": "政府が課す税金",
-    "description_zh": "政府徵收的稅金"
-  }
-}
-```
+## 🎨 UI Components
 
-## 🔐 認證與安全
+### Dashboard
+- Salary overview cards
+- Monthly trend charts
+- Yearly comparison graphs
+- Income vs deductions pie chart
+- Export functionality
 
-- **Google OAuth 2.0** 登入
-- **JWT** 身份驗證
-- **Rate Limiting** 防止濫用
-- **Helmet** 安全標頭
-- **CORS** 跨域資源共享控制
+### Dictionary
+- Searchable payroll terms
+- Category-based filtering
+- Multi-language support
+- Custom term management
 
-## 📊 API 端點
+### Payroll Management
+- File upload interface
+- Manual data entry forms
+- Historical data viewing
+- Data validation
 
-### 認證
-- `POST /api/auth/google` - Google OAuth 登入
+## 🌐 Internationalization
 
-### 用戶管理
-- `GET /api/users/profile` - 取得用戶資料
-- `PATCH /api/users/profile` - 更新用戶資料
+The app supports three languages:
+- **Japanese (JP)** - 日本語
+- **English (EN)** - English  
+- **Traditional Chinese (ZH)** - 繁體中文
 
-### 薪資管理
-- `POST /api/payroll/upload` - 上傳薪資單
-- `GET /api/payroll/history` - 取得薪資歷史
-- `POST /api/payroll/manual` - 手動輸入薪資
+Language files are located in `frontend/src/i18n/locales/`
 
-### 詞典管理
-- `GET /api/dictionary/terms` - 取得薪資詞彙
-- `POST /api/dictionary/terms` - 新增自訂詞彙
+## 📱 Responsive Design
 
-### 報表
-- `GET /api/reports/annual` - 年度報表
-- `GET /api/reports/monthly` - 月度報表
-- `POST /api/reports/custom` - 自訂範圍報表
+- Mobile-first approach
+- Tailwind CSS responsive utilities
+- Optimized for all screen sizes
+- Touch-friendly interface
 
-## 🎨 UI/UX 設計
+## 🔒 Security Features
 
-- **響應式設計** - 支援各種裝置
-- **深色/淺色主題** - 自動主題切換
-- **現代化卡片設計** - 清晰的資訊層次
-- **直觀的圖表** - 易於理解的數據視覺化
-- **無障礙設計** - 支援螢幕閱讀器
+- JWT-based authentication
+- Google OAuth 2.0
+- Rate limiting
+- Input validation
+- SQL injection protection
+- CORS configuration
 
-## 🧪 開發與測試
+## 🚀 Deployment
 
-### 開發模式
+### Backend Deployment
 ```bash
-# 前端
-cd frontend
-npm run dev
-
-# 後端
-cd backend
-npm run dev
-```
-
-### 建置
-```bash
-# 前端
-cd frontend
+# Production build
 npm run build
 
-# 後端
-cd backend
+# Start production server
 npm start
 ```
 
-## 🤝 貢獻指南
+### Frontend Deployment
+```bash
+# Build for production
+npm run build
 
-1. Fork 專案
-2. 建立功能分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交變更 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 開啟 Pull Request
+# Deploy dist/ folder to your hosting service
+```
 
-## 📝 授權
+## 📝 API Endpoints
 
-本專案採用 ISC 授權條款 - 詳見 [LICENSE](LICENSE) 檔案
+### Authentication
+- `POST /api/auth/google` - Google OAuth login
+- `GET /api/auth/me` - Get current user
+- `POST /api/auth/logout` - Logout
 
-## 📞 支援
+### Users
+- `GET /api/users/profile` - Get user profile
+- `PUT /api/users/profile` - Update user profile
+- `GET /api/users/companies` - Get user companies
 
-如有問題或建議，請：
-- 開啟 [Issue](../../issues)
-- 聯絡開發團隊
-- 查看 [Wiki](../../wiki)
+### Payroll
+- `GET /api/payroll/slips` - Get payroll slips
+- `POST /api/payroll/slips` - Create payroll slip
+- `PUT /api/payroll/slips/:id` - Update payroll slip
+- `DELETE /api/payroll/slips/:id` - Delete payroll slip
 
-## 🙏 致謝
+### Dictionary
+- `GET /api/dictionary/terms` - Get payroll terms
+- `POST /api/dictionary/terms` - Create custom term
+- `PUT /api/dictionary/terms/:id` - Update term
+- `DELETE /api/dictionary/terms/:id` - Delete term
 
-- React 社群
-- Tailwind CSS 團隊
-- PostgreSQL 社群
-- 所有貢獻者
+### Reports
+- `GET /api/reports/summary` - Get salary summary
+- `POST /api/reports/export/pdf` - Export to PDF
+- `POST /api/reports/export/csv` - Export to CSV
+
+## 🧪 Testing
+
+```bash
+# Backend tests
+cd backend
+npm test
+
+# Frontend tests
+cd frontend
+npm test
+```
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## 📄 License
+
+This project is licensed under the ISC License.
+
+## 🆘 Support
+
+For support and questions:
+- Create an issue in the repository
+- Contact the development team
+- Check the documentation
+
+## 🔮 Future Features
+
+- API integration with payroll systems
+- Savings goal tracking
+- Industry-level salary comparison
+- AI-driven financial advice
+- Mobile app development
+- Advanced analytics and forecasting
 
 ---
 
-**GoalPay** - 讓薪資管理更智能、更簡單 🎯
+**GoalPay** - Making salary analysis simple and insightful for workers in Japan and beyond.

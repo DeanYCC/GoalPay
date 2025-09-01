@@ -25,7 +25,12 @@
     "pg": "^8.11.3",
     "sequelize": "^6.35.0",
     "express-rate-limit": "^7.1.5",
-    "multer": "^1.4.5-lts.1"
+    "multer": "^1.4.5-lts.1",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "csv-writer": "^1.6.0",
+    "moment": "^2.29.4",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.2"

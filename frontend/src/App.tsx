@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { LanguageProvider } from './contexts/LanguageContext';
-import Layout from './components/Layout/Layout';
+import Layout from './components/Layout';
 import Dashboard from './pages/Dashboard/Dashboard';
 import Login from './pages/Auth/Login';
 import PayrollUpload from './pages/Payroll/PayrollUpload';

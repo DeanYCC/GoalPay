@@ -1,0 +1,124 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  avatarUrl String?  // User avatar image URL
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  payrolls Payroll[]
+  companies Company[]
+  userSettings UserSettings?
+
+  @@map("users")
+}
+
+model UserSettings {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  language        String   @default("zh-TW")
+  theme           String   @default("light")
+  defaultCurrency String   @default("JPY")
+  dateFormat      String   @default("YYYY-MM-DD")
+  notificationsEnabled Boolean @default(true)
+  emailNotifications Boolean @default(true)
+  timezone        String?  @default("Asia/Tokyo")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  userId      String
+  name        String
+  industry    String?
+  employee_count String? // Company size: "1-10", "11-50", "51-200", "201-500", "501-1000", "1000+"
+  location    String?
+  default_currency String @default("JPY") // Default currency: "JPY", "USD", "CNY", "TWD"
+  startDate   DateTime
+  endDate     DateTime?
+  position    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payrolls Payroll[]
+
+  @@map("companies")
+}
+
+model Payroll {
+  id            String   @id @default(cuid())
+  userId        String
+  companyId     String?  // Reference to company
+  companyName   String
+  division      String?
+  employeeNo    String
+  name          String
+  daysWorked    Int
+  absentDays    Int
+  paidLeave     Int
+  unpaidLeave   Int
+  baseSalary    Float
+  allowance     Float
+  grossSalary   Float
+  deductions    Float
+  insurance     Float
+  incomeTax     Float
+  netPay        Float
+  bankTransfer  Float
+  cash          Float
+  
+  // Custom fields (stored as JSON)
+  customFields Json?
+  
+  // Date fields
+  payrollDate  DateTime
+  paymentMonth String // Format: "YYYY-MM"
+  paymentYear  String // Format: "YYYY"
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company Company? @relation(fields: [companyId], references: [id])
+
+  @@map("payrolls")
+}
+
+model SalaryTerm {
+  id             String   @id @default(cuid())
+  key            String   @unique
+  en             String   // English
+  jp             String   // Japanese
+  zh             String   // Chinese
+  descriptionEn  String   // English description
+  descriptionJp  String   // Japanese description
+  descriptionZh  String   // Chinese description
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@map("salary_terms")
+}
