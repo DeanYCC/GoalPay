@@ -24,7 +24,7 @@ i18n
   .init({
     resources,
     fallbackLng: 'zh',
-    debug: process.env.NODE_ENV === 'development',
+    debug: false,
 
     interpolation: {
       escapeValue: false,

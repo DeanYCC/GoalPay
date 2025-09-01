@@ -1,0 +1,21 @@
+{
+  "id": "report-1756740264612-gxayg7qag",
+  "timestamp": "2025-09-01T15:24:24.612Z",
+  "userDescription": "儀表板無法載入數據，顯示網絡錯誤",
+  "diagnosticInfo": {
+    "timestamp": "2025-09-01T15:24:00.000Z",
+    "apiEndpoints": {
+      "health": "accessible",
+      "dashboard": "unreachable",
+      "payroll": "accessible"
+    },
+    "errors": [],
+    "performance": {
+      "loadTime": 1500
+    }
+  },
+  "generatedAt": "2025-09-01T15:24:00.000Z",
+  "status": "pending",
+  "priority": "medium",
+  "category": "dashboard"
+}

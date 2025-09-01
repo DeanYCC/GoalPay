@@ -14,6 +14,8 @@ const userRoutes = require('./routes/users');
 const payrollRoutes = require('./routes/payroll');
 const dashboardRoutes = require('./routes/dashboard');
 const companyRoutes = require('./routes/companies');
+const supportRoutes = require('./routes/support');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -57,6 +59,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/companies', companyRoutes);
+app.use('/api/support', supportRoutes);
+app.use('/api/admin', adminRoutes);
 
 // 健康檢查
 app.get('/health', (req, res) => {
