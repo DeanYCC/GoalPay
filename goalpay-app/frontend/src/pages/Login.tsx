@@ -58,6 +58,10 @@ const Login: React.FC = () => {
     console.log('測試Token:', testToken);
     
     try {
+      // 直接設置localStorage
+      localStorage.setItem('user', JSON.stringify(testUser));
+      localStorage.setItem('token', testToken);
+      
       // 使用 auth context 的 login 函數
       login(testUser, testToken);
       console.log('登入成功，準備導航到儀表板...');

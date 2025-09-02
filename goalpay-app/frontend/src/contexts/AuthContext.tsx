@@ -55,18 +55,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // 驗證 token 並獲取用戶信息
   useEffect(() => {
     const validateToken = async () => {
-      if (token) {
-        // 檢查是否為測試用戶
-        const user = localStorage.getItem('user');
-        if (user) {
-          const userData = JSON.parse(user);
-          if (userData.email === 'test@goalpay.com') {
-            // 測試用戶，直接設置用戶數據
-            setUser(userData);
-            return;
+      // 首先檢查localStorage中是否有用戶數據（測試用戶）
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const userData = JSON.parse(storedUser);
+        if (userData.email === 'test@goalpay.com') {
+          console.log('AuthContext: 發現測試用戶數據，設置用戶狀態');
+          setUser(userData);
+          // 確保token也存在
+          const storedToken = localStorage.getItem('token');
+          if (storedToken) {
+            setToken(storedToken);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
           }
+          return;
         }
-        
+      }
+
+      if (token) {
         try {
           const response = await axios.get(API_ENDPOINTS.AUTH.VERIFY)
           if (response.data.valid) {
@@ -75,12 +81,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           } else {
             // Token 無效，清除本地存儲
             localStorage.removeItem('token')
+            localStorage.removeItem('user')
             setToken(null)
             setUser(null)
           }
         } catch (error) {
           console.error('Token validation failed:', error)
           localStorage.removeItem('token')
+          localStorage.removeItem('user')
           setToken(null)
           setUser(null)
         }
