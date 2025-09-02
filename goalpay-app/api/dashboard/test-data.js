@@ -16,12 +16,16 @@ export default function handler(req, res) {
     return;
   }
 
-  // 模擬儀表板數據
-  const mockData = {
-    totalSalary: 1250000,
-    averageSalary: 416667,
-    totalEmployees: 3,
-    monthlyGrowth: 5.2,
+  // 模擬測試數據
+  const testData = {
+    summary: {
+      totalSalary: 1250000,
+      averageSalary: 416667,
+      totalEmployees: 3,
+      monthlyGrowth: 5.2,
+      monthlyIncome: 1250000,
+      currency: 'JPY'
+    },
     recentPayrolls: [
       {
         id: 1,
@@ -46,6 +50,6 @@ export default function handler(req, res) {
 
   // 添加延遲以模擬真實API
   setTimeout(() => {
-    res.status(200).json(mockData);
+    res.status(200).json(testData);
   }, 100);
 }
