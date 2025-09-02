@@ -26,9 +26,13 @@ const Dashboard: React.FC = () => {
 
   // 獲取儀表板數據
   const { data: dashboardData, isLoading, error } = useQuery(
-    'dashboardData',
+    ['dashboardData', isTestUser],
     async () => {
-      if (isTestUser) {
+      // 直接檢查localStorage中的用戶數據
+      const user = localStorage.getItem('user');
+      const isTest = user ? JSON.parse(user).email === 'test@goalpay.com' : false;
+      
+      if (isTest) {
         // 使用測試數據端點
         const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
         return response.data;
@@ -68,6 +72,14 @@ const Dashboard: React.FC = () => {
           </p>
           <div className="mt-4 text-sm text-gray-500">
             錯誤詳情: {error.message}
+          </div>
+          <div className="mt-4">
+            <button 
+              onClick={() => window.location.reload()} 
+              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            >
+              重新載入
+            </button>
           </div>
         </div>
       </div>

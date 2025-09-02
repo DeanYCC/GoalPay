@@ -37,6 +37,8 @@ const Login: React.FC = () => {
   };
 
   const handleTestLogin = () => {
+    console.log('開始測試登入...');
+    
     // 創建測試用戶數據
     const testUser = {
       id: 1,
@@ -52,11 +54,20 @@ const Login: React.FC = () => {
     // 創建測試 token
     const testToken = 'test-token-' + Date.now();
     
-    // 使用 auth context 的 login 函數
-    login(testUser, testToken);
+    console.log('測試用戶數據:', testUser);
+    console.log('測試Token:', testToken);
     
-    // 導航到儀表板
-    navigate('/dashboard');
+    try {
+      // 使用 auth context 的 login 函數
+      login(testUser, testToken);
+      console.log('登入成功，準備導航到儀表板...');
+      
+      // 導航到儀表板
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('測試登入失敗:', error);
+      alert('測試登入失敗，請檢查控制台錯誤信息');
+    }
   };
 
   return (
