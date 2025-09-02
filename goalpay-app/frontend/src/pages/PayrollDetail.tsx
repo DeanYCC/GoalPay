@@ -6,6 +6,7 @@ import axios from 'axios';
 import { Save, ArrowLeft, Plus, Trash2, Edit, Eye } from 'lucide-react';
 import CompanySelector from '../components/CompanySelector/CompanySelector';
 import { Company } from '../types/company';
+import { API_ENDPOINTS } from '../config/api';
 
 interface PayrollItem {
   id?: number;
@@ -91,7 +92,7 @@ const PayrollDetail: React.FC = () => {
       }
       
       // 獲取現有薪資單
-      const response = await axios.get(`http://localhost:5001/api/payroll/${id}`);
+      const response = await axios.get(API_ENDPOINTS.PAYROLL.DETAIL(id));
       return response.data;
     },
     {
@@ -109,10 +110,10 @@ const PayrollDetail: React.FC = () => {
   const updatePayrollMutation = useMutation(
     async (data: PayrollData) => {
       if (id === 'new') {
-        const response = await axios.post('http://localhost:5001/api/payroll', data);
+        const response = await axios.post(API_ENDPOINTS.PAYROLL.CREATE, data);
         return response.data;
       } else {
-        const response = await axios.put(`http://localhost:5001/api/payroll/${id}`, data);
+        const response = await axios.put(API_ENDPOINTS.PAYROLL.UPDATE(id), data);
         return response.data;
       }
     },

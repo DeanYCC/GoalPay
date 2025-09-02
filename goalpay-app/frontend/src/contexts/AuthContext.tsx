@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
 import axios from 'axios'
+import { API_ENDPOINTS } from '../config/api'
 
 interface User {
   id: number
@@ -7,15 +8,19 @@ interface User {
   name: string
   picture?: string
   company_name?: string
-  currency: string
-  theme: string
-  language: string
+  currency?: string
+  theme?: string
+  language?: string
+  paydayType?: string
+  customPayday?: number
+  periodStartDay?: number
+  periodEndDay?: number
 }
 
 interface AuthContextType {
   user: User | null
   token: string | null
-  login: () => void
+  login: (userData?: User, userToken?: string) => void
   logout: () => void
   updateUser: (userData: Partial<User>) => Promise<void>
 }
@@ -63,9 +68,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
         
         try {
-          const response = await axios.get('http://localhost:5001/api/auth/verify')
+          const response = await axios.get(API_ENDPOINTS.AUTH.VERIFY)
           if (response.data.valid) {
-            const userResponse = await axios.get('http://localhost:5001/api/users/profile')
+            const userResponse = await axios.get(API_ENDPOINTS.USERS.PROFILE)
             setUser(userResponse.data)
           } else {
             // Token 無效，清除本地存儲
@@ -95,7 +100,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       axios.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
     } else {
       // Google OAuth 登入
-      window.location.href = 'http://localhost:5001/api/auth/google';
+      window.location.href = API_ENDPOINTS.AUTH.GOOGLE;
     }
   }
 
@@ -108,7 +113,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const updateUser = async (userData: Partial<User>) => {
     try {
-      const response = await axios.put('http://localhost:5001/api/users/profile', userData)
+      const response = await axios.put(API_ENDPOINTS.USERS.PROFILE, userData)
       setUser(response.data)
     } catch (error) {
       console.error('Failed to update user:', error)

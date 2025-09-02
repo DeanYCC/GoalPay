@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { API_ENDPOINTS } from '../../config/api';
 
 interface DiagnosticInfo {
   timestamp: string;
@@ -61,7 +62,7 @@ const DiagnosticTool: React.FC = () => {
     };
 
     try {
-      const healthResponse = await fetch('http://localhost:5001/health', { 
+      const healthResponse = await fetch(API_ENDPOINTS.HEALTH, { 
         method: 'GET'
       });
       apiEndpoints.health = healthResponse.ok ? 'accessible' : `error-${healthResponse.status}`;
@@ -70,7 +71,7 @@ const DiagnosticTool: React.FC = () => {
     }
 
     try {
-      const dashboardResponse = await fetch('http://localhost:5001/api/dashboard/summary', { 
+      const dashboardResponse = await fetch(API_ENDPOINTS.DASHBOARD.SUMMARY, { 
         method: 'GET'
       });
       apiEndpoints.dashboard = dashboardResponse.ok ? 'accessible' : `error-${dashboardResponse.status}`;
@@ -79,7 +80,7 @@ const DiagnosticTool: React.FC = () => {
     }
 
     try {
-      const payrollResponse = await fetch('http://localhost:5001/api/payroll', { 
+      const payrollResponse = await fetch(API_ENDPOINTS.PAYROLL.LIST, { 
         method: 'GET'
       });
       apiEndpoints.payroll = payrollResponse.ok ? 'accessible' : `error-${payrollResponse.status}`;
@@ -184,7 +185,7 @@ const DiagnosticTool: React.FC = () => {
       };
 
       // 這裡可以發送到您的支援系統API
-      const response = await fetch('http://localhost:5001/api/support/diagnostic', {
+      const response = await fetch(API_ENDPOINTS.SUPPORT.DIAGNOSTIC, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

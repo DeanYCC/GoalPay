@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useQuery } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { Download, FileText, TrendingUp, Calendar, DollarSign, Settings, ChevronDown, ChevronUp, Edit } from 'lucide-react';
 
@@ -20,7 +21,7 @@ const Reports: React.FC = () => {
   const { data: reportsData, isLoading } = useQuery(
     ['reports', selectedPeriod],
     async () => {
-      const response = await axios.get(`http://localhost:5001/api/dashboard/test-data`);
+      const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
       return response.data;
     },
     {

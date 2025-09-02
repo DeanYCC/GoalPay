@@ -8,6 +8,7 @@ import QuickActions from '../components/dashboard/QuickActions';
 import RecentPayrolls from '../components/dashboard/RecentPayrolls';
 import SalaryTerms from '../components/SalaryTerms/SalaryTerms';
 import { TrendingUp, TrendingDown, DollarSign, Calculator } from 'lucide-react';
+import { API_ENDPOINTS } from '../config/api';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -29,11 +30,11 @@ const Dashboard: React.FC = () => {
     async () => {
       if (isTestUser) {
         // 使用測試數據端點
-        const response = await axios.get('http://localhost:5001/api/dashboard/test-data');
+        const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
         return response.data;
       } else {
         // 使用實際數據端點
-        const response = await axios.get('http://localhost:5001/api/dashboard/summary');
+        const response = await axios.get(API_ENDPOINTS.DASHBOARD.SUMMARY);
         return response.data;
       }
     },
@@ -65,6 +66,9 @@ const Dashboard: React.FC = () => {
           <p className="text-gray-600 dark:text-gray-400">
             無法載入儀表板數據，請檢查網絡連接
           </p>
+          <div className="mt-4 text-sm text-gray-500">
+            錯誤詳情: {error.message}
+          </div>
         </div>
       </div>
     );
@@ -98,67 +102,42 @@ const Dashboard: React.FC = () => {
           title={t('dashboard.totalIncome')}
           value={summary.monthlyIncome || summary.totalIncome}
           currency={summary.currency || 'JPY'}
-          trend={summary.growthRate || 0}
           icon={DollarSign}
-          trendUp={summary.growthRate > 0}
+          trend={summary.monthlyGrowth}
+          trendDirection={summary.monthlyGrowth >= 0 ? 'up' : 'down'}
         />
         <StatsCard
-          title={t('dashboard.totalDeductions')}
-          value={summary.monthlyDeductions || summary.totalDeductions}
+          title={t('dashboard.averageSalary')}
+          value={summary.averageSalary}
           currency={summary.currency || 'JPY'}
-          trend={-2.1}
           icon={Calculator}
-          trendUp={false}
         />
         <StatsCard
-          title={t('dashboard.netIncome')}
-          value={summary.netIncome}
-          currency={summary.currency || 'JPY'}
-          trend={summary.growthRate || 5.2}
+          title={t('dashboard.totalEmployees')}
+          value={summary.totalEmployees}
           icon={TrendingUp}
-          trendUp={true}
         />
         <StatsCard
-          title={t('dashboard.monthlyAverage')}
-          value={summary.monthlyAverage || summary.netIncome}
-          currency={summary.currency || 'JPY'}
-          trend={3.8}
-          icon={TrendingUp}
-          trendUp={true}
+          title={t('dashboard.monthlyGrowth')}
+          value={`${summary.monthlyGrowth}%`}
+          icon={summary.monthlyGrowth >= 0 ? TrendingUp : TrendingDown}
+          trendDirection={summary.monthlyGrowth >= 0 ? 'up' : 'down'}
         />
       </div>
 
-      {/* 圖表和快速操作 */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* 薪資趨勢圖 */}
-        <div className="lg:col-span-2">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {t('dashboard.monthlyOverview')}
-            </h3>
-            <SalaryChart data={dashboardData?.taxHistory || []} />
-          </div>
-        </div>
-
-        {/* 快速操作 */}
-        <div className="space-y-6">
-          <QuickActions onOpenSalaryTerms={() => setShowSalaryTerms(true)} />
-          
-          {/* 最近薪資單 */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-              {t('dashboard.recentPayrolls')}
-            </h3>
-            <RecentPayrolls payrolls={recentPayrolls} />
-          </div>
-        </div>
+      {/* 圖表和最近薪資單 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <SalaryChart data={summary} />
+        <RecentPayrolls payrolls={recentPayrolls} />
       </div>
 
-      {/* 薪資條款彈窗 */}
-      <SalaryTerms 
-        isOpen={showSalaryTerms} 
-        onClose={() => setShowSalaryTerms(false)} 
-      />
+      {/* 快速操作 */}
+      <QuickActions onShowSalaryTerms={() => setShowSalaryTerms(true)} />
+
+      {/* 薪資條款模態框 */}
+      {showSalaryTerms && (
+        <SalaryTerms onClose={() => setShowSalaryTerms(false)} />
+      )}
     </div>
   );
 };

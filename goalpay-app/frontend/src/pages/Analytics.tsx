@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useQuery } from 'react-query';
+import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { TrendingUp, TrendingDown, DollarSign, Calendar, BarChart3 } from 'lucide-react';
 
 const Analytics: React.FC = () => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const [selectedPeriod, setSelectedPeriod] = useState('6m');
 
   // 獲取分析數據
   const { data: analyticsData, isLoading } = useQuery(
     ['analytics', selectedPeriod],
     async () => {
-      const response = await axios.get(`http://localhost:5001/api/dashboard/test-data`);
+      const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
       return response.data;
     },
     {

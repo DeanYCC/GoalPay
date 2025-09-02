@@ -5,6 +5,7 @@ import CompanySelector from '../components/CompanySelector/CompanySelector'
 import PayrollItemSelector from '../components/PayrollItemSelector/PayrollItemSelector'
 import { Company } from '../types/company'
 import { getDefaultItems, PayrollItemTemplate } from '../types/payrollItem'
+import { API_ENDPOINTS } from '../config/api'
 
 const Upload: React.FC = () => {
   const { t } = useLanguage()
@@ -61,7 +62,7 @@ const Upload: React.FC = () => {
   // 下載CSV範本
   const downloadCsvTemplate = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/payroll/template/csv')
+      const response = await fetch(API_ENDPOINTS.PAYROLL.CSV_TEMPLATE)
       if (response.ok) {
         const blob = await response.blob()
         const url = window.URL.createObjectURL(blob)
@@ -93,7 +94,7 @@ const Upload: React.FC = () => {
         const formData = new FormData()
         formData.append('csvFile', file)
         
-        const response = await fetch('http://localhost:5001/api/payroll/upload/csv', {
+        const response = await fetch(API_ENDPOINTS.PAYROLL.CSV_UPLOAD, {
           method: 'POST',
           body: formData
         })

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import DiagnosticTool from '../components/DiagnosticTool/DiagnosticTool';
+import { API_ENDPOINTS } from '../config/api';
 
 interface FAQ {
   id: string;
@@ -41,7 +42,7 @@ const Support: React.FC = () => {
 
   const loadFAQ = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/support/faq');
+      const response = await fetch(API_ENDPOINTS.SUPPORT.FAQ);
       if (response.ok) {
         const data = await response.json();
         setFaq(data.faq);
@@ -53,7 +54,7 @@ const Support: React.FC = () => {
 
   const loadSystemStatus = async () => {
     try {
-      const response = await fetch('http://localhost:5001/api/support/system-status');
+      const response = await fetch(API_ENDPOINTS.SUPPORT.SYSTEM_STATUS);
       if (response.ok) {
         const data = await response.json();
         setSystemStatus(data);

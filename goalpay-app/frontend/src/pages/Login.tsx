@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../contexts/LanguageContext';
 import { Globe } from 'lucide-react';
+import { API_ENDPOINTS } from '../config/api';
 
 const Login: React.FC = () => {
   const { login } = useAuth();
@@ -32,7 +33,7 @@ const Login: React.FC = () => {
 
   const handleGoogleLogin = () => {
     // 重定向到後端 Google OAuth 端點
-    window.location.href = 'http://localhost:5001/api/auth/google';
+    window.location.href = API_ENDPOINTS.AUTH.GOOGLE;
   };
 
   const handleTestLogin = () => {
