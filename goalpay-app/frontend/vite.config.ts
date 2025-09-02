@@ -19,7 +19,7 @@ export default defineConfig({
       },
     },
     headers: {
-      'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss:;"
+      'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-dynamic'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss: http: https:; object-src 'none'; base-uri 'self'; form-action 'self';"
     }
   },
   build: {
@@ -34,5 +34,8 @@ export default defineConfig({
   },
   define: {
     'process.env.NODE_ENV': '"development"'
+  },
+  optimizeDeps: {
+    include: ['react', 'react-dom']
   }
 })
