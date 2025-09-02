@@ -18,6 +18,9 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    headers: {
+      'Content-Security-Policy': "default-src 'self' 'unsafe-inline' 'unsafe-eval' data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ws: wss:;"
+    }
   },
   build: {
     rollupOptions: {
@@ -29,4 +32,7 @@ export default defineConfig({
   esbuild: {
     target: 'es2020',
   },
+  define: {
+    'process.env.NODE_ENV': '"development"'
+  }
 })
