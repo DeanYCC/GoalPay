@@ -12,10 +12,16 @@ const Layout: React.FC = () => {
   const { language } = useLanguage()
   const location = useLocation()
 
+  console.log('Layout: 當前用戶狀態', user);
+  console.log('Layout: 當前路徑', location.pathname);
+
   // 如果用戶未登入，重定向到登入頁面
   if (!user) {
+    console.log('Layout: 用戶未登入，重定向到登入頁面');
     return <Navigate to="/login" replace />
   }
+
+  console.log('Layout: 用戶已登入，渲染主界面');
 
   return (
     <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>

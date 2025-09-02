@@ -112,28 +112,37 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title={t('dashboard.totalIncome')}
-          value={summary.monthlyIncome || summary.totalIncome}
+          value={summary.monthlyIncome || summary.totalIncome || 0}
           currency={summary.currency || 'JPY'}
-          icon={DollarSign}
-          trend={summary.monthlyGrowth}
-          trendDirection={summary.monthlyGrowth >= 0 ? 'up' : 'down'}
+          trend={summary.monthlyGrowth || 0}
+          icon="dollar-sign"
+          color="green"
         />
         <StatsCard
           title={t('dashboard.averageSalary')}
-          value={summary.averageSalary}
+          value={summary.averageSalary || 0}
           currency={summary.currency || 'JPY'}
-          icon={Calculator}
+          trend={0}
+          icon="bar-chart"
+          color="blue"
         />
         <StatsCard
           title={t('dashboard.totalEmployees')}
-          value={summary.totalEmployees}
-          icon={TrendingUp}
+          value={summary.totalEmployees || 0}
+          currency="JPY"
+          trend={0}
+          icon="trending-up"
+          color="purple"
+          isCurrency={false}
         />
         <StatsCard
           title={t('dashboard.monthlyGrowth')}
-          value={`${summary.monthlyGrowth}%`}
-          icon={summary.monthlyGrowth >= 0 ? TrendingUp : TrendingDown}
-          trendDirection={summary.monthlyGrowth >= 0 ? 'up' : 'down'}
+          value={Math.abs(summary.monthlyGrowth || 0)}
+          currency="JPY"
+          trend={summary.monthlyGrowth || 0}
+          icon={summary.monthlyGrowth >= 0 ? "trending-up" : "trending-down"}
+          color={summary.monthlyGrowth >= 0 ? "green" : "red"}
+          isCurrency={false}
         />
       </div>
 

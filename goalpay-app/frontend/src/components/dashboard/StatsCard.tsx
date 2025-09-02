@@ -8,6 +8,7 @@ interface StatsCardProps {
   trend: number
   icon: string
   color: 'green' | 'red' | 'blue' | 'purple'
+  isCurrency?: boolean; // Added isCurrency prop
 }
 
 const StatsCard: React.FC<StatsCardProps> = ({
@@ -16,15 +17,24 @@ const StatsCard: React.FC<StatsCardProps> = ({
   currency,
   trend,
   icon,
-  color
+  color,
+  isCurrency = true
 }) => {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('ja-JP', {
-      style: 'currency',
-      currency: currency,
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount)
+  const formatValue = (amount: number) => {
+    if (isCurrency) {
+      // 確保有有效的貨幣代碼
+      const validCurrency = currency && currency.trim() !== '' ? currency : 'JPY';
+      
+      return new Intl.NumberFormat('ja-JP', {
+        style: 'currency',
+        currency: validCurrency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(amount)
+    } else {
+      // 非貨幣值，直接格式化數字
+      return new Intl.NumberFormat('ja-JP').format(amount)
+    }
   }
 
   const getIcon = () => {
@@ -63,7 +73,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
         <div>
           <p className="text-sm font-medium text-muted-foreground">{title}</p>
           <p className="text-2xl font-bold text-foreground mt-1">
-            {formatCurrency(value)}
+            {formatValue(value)}
           </p>
         </div>
         <div className={`p-3 rounded-lg border ${getColorClasses()}`}>

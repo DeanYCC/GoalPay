@@ -92,12 +92,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = (userData?: User, userToken?: string) => {
     if (userData && userToken) {
-      // 測試登入
+      // 測試登入 - 立即更新狀態
+      console.log('AuthContext: 設置用戶數據', userData);
       setUser(userData);
       setToken(userToken);
       localStorage.setItem('token', userToken);
       localStorage.setItem('user', JSON.stringify(userData));
       axios.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
+      
+      // 強制觸發重新渲染
+      setTimeout(() => {
+        console.log('AuthContext: 用戶狀態已更新');
+      }, 0);
     } else {
       // Google OAuth 登入
       window.location.href = API_ENDPOINTS.AUTH.GOOGLE;
