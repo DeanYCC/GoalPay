@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, createBrowserRouter, RouterProvider } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './contexts/AuthContext'
@@ -32,7 +32,7 @@ function App() {
         <ThemeProvider>
           <LanguageProvider>
             <div className="min-h-screen bg-background text-foreground">
-              <Routes>
+              <Routes future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
                 <Route path="/login" element={<Login />} />
                 <Route path="/auth-callback" element={<AuthCallback />} />
                 <Route path="/" element={<Layout />}>
