@@ -1,5 +1,5 @@
 import React from 'react'
-import { useLanguage } from '../../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import {
   LineChart,
   Line,
@@ -25,7 +25,7 @@ interface SalaryChartProps {
 }
 
 const SalaryChart: React.FC<SalaryChartProps> = ({ data }) => {
-  const { t } = useLanguage()
+  const { t } = useTranslation()
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('ja-JP', {

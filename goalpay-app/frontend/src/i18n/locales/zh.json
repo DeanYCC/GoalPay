@@ -52,7 +52,15 @@
     "quickActions": "快速操作",
     "monthlyOverview": "本月概覽",
     "payslips": "薪資單",
-    "salaryTrend": "薪資趨勢"
+    "salaryTrend": "薪資趨勢",
+    "averageSalary": "平均薪資",
+    "totalEmployees": "總員工數",
+    "monthlyGrowth": "月成長率",
+    "testMode": "🧪 測試模式",
+    "uploadPayslipData": "新增薪資單數據",
+    "viewDetailedReports": "查看詳細報告",
+    "exportPayrollData": "匯出薪資數據",
+    "salaryTermsGuide": "了解薪資術語"
   },
   "upload": {
     "title": "上傳薪資單",

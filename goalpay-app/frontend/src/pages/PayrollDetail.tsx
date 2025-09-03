@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useLanguage } from '../contexts/LanguageContext';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
+import { useTranslation } from 'react-i18next';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Save, ArrowLeft, Plus, Trash2, Edit, Eye } from 'lucide-react';
 import CompanySelector from '../components/CompanySelector/CompanySelector';
@@ -34,7 +34,7 @@ interface PayrollData {
 const PayrollDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   
   const [isEditing, setIsEditing] = useState(id === 'new');

@@ -19,31 +19,55 @@ export default function handler(req, res) {
   // 模擬測試數據
   const testData = {
     summary: {
-      totalSalary: 1250000,
-      averageSalary: 416667,
-      totalEmployees: 3,
-      monthlyGrowth: 5.2,
-      monthlyIncome: 1250000,
+      totalIncome: 450000,
+      totalDeductions: 85000,
+      netIncome: 365000,
+      monthlyAverage: 365000,
+      monthlyGrowth: 2.5,
       currency: 'JPY'
     },
     recentPayrolls: [
       {
         id: 1,
-        employeeName: "張小明",
-        amount: 335000,
-        date: "2024-06-30"
+        company: "測試科技公司",
+        employeeId: "EMP001",
+        slipDate: "2024-06-30",
+        netIncome: 365000,
+        items: [
+          { item_type: 'income', item_name: '基本薪資', amount: 400000 },
+          { item_type: 'income', item_name: '加班費', amount: 50000 },
+          { item_type: 'deduction', item_name: '所得稅', amount: 45000 },
+          { item_type: 'deduction', item_name: '健康保險', amount: 25000 },
+          { item_type: 'deduction', item_name: '養老金', amount: 15000 }
+        ]
       },
       {
         id: 2,
-        employeeName: "李美玲",
-        amount: 313000,
-        date: "2024-06-30"
+        company: "測試科技公司",
+        employeeId: "EMP001",
+        slipDate: "2024-05-31",
+        netIncome: 361000,
+        items: [
+          { item_type: 'income', item_name: '基本薪資', amount: 400000 },
+          { item_type: 'income', item_name: '加班費', amount: 46000 },
+          { item_type: 'deduction', item_name: '所得稅', amount: 45000 },
+          { item_type: 'deduction', item_name: '健康保險', amount: 25000 },
+          { item_type: 'deduction', item_name: '養老金', amount: 15000 }
+        ]
       },
       {
         id: 3,
-        employeeName: "王建國",
-        amount: 324000,
-        date: "2024-06-30"
+        company: "測試科技公司",
+        employeeId: "EMP001",
+        slipDate: "2024-04-30",
+        netIncome: 357000,
+        items: [
+          { item_type: 'income', item_name: '基本薪資', amount: 400000 },
+          { item_type: 'income', item_name: '加班費', amount: 42000 },
+          { item_type: 'deduction', item_name: '所得稅', amount: 45000 },
+          { item_type: 'deduction', item_name: '健康保險', amount: 25000 },
+          { item_type: 'deduction', item_name: '養老金', amount: 15000 }
+        ]
       }
     ]
   };

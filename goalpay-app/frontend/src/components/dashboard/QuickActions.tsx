@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useLanguage } from '../../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import {
   Upload,
   FileText,
@@ -17,26 +17,26 @@ interface QuickActionsProps {
 
 const QuickActions: React.FC<QuickActionsProps> = ({ onOpenSalaryTerms }) => {
   const navigate = useNavigate()
-  const { t } = useLanguage()
+  const { t } = useTranslation()
 
   const actions = [
     {
       title: t('dashboard.uploadPayslip'),
-      description: '新增薪資單數據',
+      description: t('dashboard.uploadPayslipData'),
       icon: Upload,
       color: 'bg-blue-500',
       onClick: () => navigate('/upload')
     },
     {
       title: t('dashboard.viewReports'),
-      description: '查看詳細報告',
+      description: t('dashboard.viewDetailedReports'),
       icon: FileText,
       color: 'bg-green-500',
       onClick: () => navigate('/reports')
     },
     {
       title: t('dashboard.exportData'),
-      description: '匯出薪資數據',
+      description: t('dashboard.exportPayrollData'),
       icon: Download,
       color: 'bg-purple-500',
       onClick: () => {
@@ -46,7 +46,7 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onOpenSalaryTerms }) => {
     },
     {
       title: t('dashboard.salaryTerms'),
-      description: '了解薪資術語',
+      description: t('dashboard.salaryTermsGuide'),
       icon: BookOpen,
       color: 'bg-orange-500',
       onClick: () => {

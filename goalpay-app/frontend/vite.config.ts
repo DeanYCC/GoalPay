@@ -12,6 +12,7 @@ export default defineConfig({
   },
   server: {
     port: 3000,
+    host: true, // 允許網絡訪問
     proxy: {
       '/api': {
         target: 'http://localhost:5001',

@@ -67,10 +67,8 @@ const Login: React.FC = () => {
       console.log('登入成功，準備導航到儀表板...');
       
       // 使用window.location.href而不是navigate
-      setTimeout(() => {
-        console.log('導航到儀表板...');
-        window.location.href = '/dashboard';
-      }, 100);
+     
+      navigate('/dashboard');
     } catch (error) {
       console.error('測試登入失敗:', error);
       alert('測試登入失敗，請檢查控制台錯誤信息');

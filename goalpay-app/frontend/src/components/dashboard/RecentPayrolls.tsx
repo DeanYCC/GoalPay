@@ -1,6 +1,6 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useLanguage } from '../../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import { FileText, Calendar, Building } from 'lucide-react'
 import { format } from 'date-fns'
 
@@ -26,7 +26,7 @@ interface RecentPayrollsProps {
 }
 
 const RecentPayrolls: React.FC<RecentPayrollsProps> = ({ payrolls, isLoading }) => {
-  const { t } = useLanguage()
+  const { t } = useTranslation()
   const navigate = useNavigate()
 
   const formatCurrency = (amount: number) => {
