@@ -11,16 +11,14 @@ const Analytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('6m');
 
   // 獲取分析數據
-  const { data: analyticsData, isLoading } = useQuery(
-    ['analytics', selectedPeriod],
-    async () => {
+  const { data: analyticsData, isLoading } = useQuery({
+    queryKey: ['analytics', selectedPeriod],
+    queryFn: async () => {
       const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
       return response.data;
     },
-    {
-      enabled: true,
-    }
-  );
+    enabled: true,
+  });
 
   if (isLoading) {
     return (

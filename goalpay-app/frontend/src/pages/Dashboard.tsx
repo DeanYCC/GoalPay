@@ -25,9 +25,9 @@ const Dashboard: React.FC = () => {
   }, []);
 
   // 獲取儀表板數據
-  const { data: dashboardData, isLoading, error } = useQuery(
-    ['dashboardData', isTestUser],
-    async () => {
+  const { data: dashboardData, isLoading, error } = useQuery({
+    queryKey: ['dashboardData', isTestUser],
+    queryFn: async () => {
       // 直接檢查localStorage中的用戶數據
       const user = localStorage.getItem('user');
       const isTest = user ? JSON.parse(user).email === 'test@goalpay.com' : false;
@@ -42,11 +42,9 @@ const Dashboard: React.FC = () => {
         return response.data;
       }
     },
-    {
-      enabled: true,
-      refetchInterval: 30000, // 每30秒刷新一次
-    }
-  );
+    enabled: true,
+    refetchInterval: 30000, // 每30秒刷新一次
+  });
 
   if (isLoading) {
     return (

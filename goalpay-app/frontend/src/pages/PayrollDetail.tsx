@@ -67,9 +67,9 @@ const PayrollDetail: React.FC = () => {
   });
 
   // 獲取薪資詳情
-  const { data: initialData, isLoading } = useQuery(
-    ['payroll', id],
-    async () => {
+  const { data: initialData, isLoading } = useQuery({
+    queryKey: ['payroll', id],
+    queryFn: async () => {
       if (id === 'new') {
         // 創建新的薪資單
         return {
@@ -95,10 +95,8 @@ const PayrollDetail: React.FC = () => {
       const response = await axios.get(API_ENDPOINTS.PAYROLL.DETAIL(id));
       return response.data;
     },
-    {
-      enabled: !!id,
-    }
-  );
+    enabled: !!id,
+  });
 
   useEffect(() => {
     if (initialData) {
@@ -107,8 +105,8 @@ const PayrollDetail: React.FC = () => {
   }, [initialData]);
 
   // 更新薪資單
-  const updatePayrollMutation = useMutation(
-    async (data: PayrollData) => {
+  const updatePayrollMutation = useMutation({
+    mutationFn: async (data: PayrollData) => {
       if (id === 'new') {
         const response = await axios.post(API_ENDPOINTS.PAYROLL.CREATE, data);
         return response.data;
@@ -117,13 +115,11 @@ const PayrollDetail: React.FC = () => {
         return response.data;
       }
     },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries(['payrolls']);
-        setIsEditing(false);
-      },
-    }
-  );
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payrolls'] });
+      setIsEditing(false);
+    },
+  });
 
   const handleSave = () => {
     if (payrollData) {

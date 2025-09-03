@@ -18,16 +18,14 @@ const Reports: React.FC = () => {
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
   // 獲取報告數據
-  const { data: reportsData, isLoading } = useQuery(
-    ['reports', selectedPeriod],
-    async () => {
+  const { data: reportsData, isLoading } = useQuery({
+    queryKey: ['reports', selectedPeriod],
+    queryFn: async () => {
       const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
       return response.data;
     },
-    {
-      enabled: true,
-    }
-  );
+    enabled: true,
+  });
 
   if (isLoading) {
     return (
