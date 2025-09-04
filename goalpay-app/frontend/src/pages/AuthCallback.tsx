@@ -1,11 +1,11 @@
 import React, { useEffect } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 
 const AuthCallback: React.FC = () => {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const { t } = useLanguage()
+  const { t } = useTranslation()
 
   useEffect(() => {
     const token = searchParams.get('token')

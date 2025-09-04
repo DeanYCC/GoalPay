@@ -52,7 +52,39 @@ const SalaryChart: React.FC<SalaryChartProps> = ({ data }) => {
     return null
   }
 
-  if (data.length === 0) {
+  // 處理和過濾數據
+  const processChartData = () => {
+    if (!data || data.length === 0) return []
+    
+    // 按月份排序
+    const sortedData = [...data].sort((a, b) => {
+      const dateA = new Date(a.month)
+      const dateB = new Date(b.month)
+      return dateA.getTime() - dateB.getTime()
+    })
+
+    // 格式化月份顯示
+    return sortedData.map(item => ({
+      ...item,
+      month: formatMonthDisplay(item.month)
+    }))
+  }
+
+  const formatMonthDisplay = (monthString: string) => {
+    try {
+      const date = new Date(monthString)
+      return date.toLocaleDateString('ja-JP', { 
+        year: 'numeric', 
+        month: 'short' 
+      })
+    } catch {
+      return monthString
+    }
+  }
+
+  const chartData = processChartData()
+
+  if (chartData.length === 0) {
     return (
       <div className="bg-card border border-border rounded-lg p-8">
         <div className="text-center">
@@ -89,8 +121,9 @@ const SalaryChart: React.FC<SalaryChartProps> = ({ data }) => {
         </div>
       </div>
 
+      {/* 使用 LineChart 顯示趨勢，更適合時間序列數據 */}
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+        <LineChart data={chartData}>
           <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
           <XAxis 
             dataKey="month" 
@@ -104,25 +137,34 @@ const SalaryChart: React.FC<SalaryChartProps> = ({ data }) => {
           />
           <Tooltip content={<CustomTooltip />} />
           <Legend />
-          <Bar 
+          <Line 
+            type="monotone" 
             dataKey="income" 
-            fill="#3B82F6" 
+            stroke="#3B82F6" 
+            strokeWidth={2}
             name={t('dashboard.totalIncome')}
-            radius={[4, 4, 0, 0]}
+            dot={{ fill: '#3B82F6', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, stroke: '#3B82F6', strokeWidth: 2 }}
           />
-          <Bar 
+          <Line 
+            type="monotone" 
             dataKey="deductions" 
-            fill="#EF4444" 
+            stroke="#EF4444" 
+            strokeWidth={2}
             name={t('dashboard.totalDeductions')}
-            radius={[4, 4, 0, 0]}
+            dot={{ fill: '#EF4444', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, stroke: '#EF4444', strokeWidth: 2 }}
           />
-          <Bar 
+          <Line 
+            type="monotone" 
             dataKey="net" 
-            fill="#10B981" 
+            stroke="#10B981" 
+            strokeWidth={2}
             name={t('dashboard.netIncome')}
-            radius={[4, 4, 0, 0]}
+            dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+            activeDot={{ r: 6, stroke: '#10B981', strokeWidth: 2 }}
           />
-        </BarChart>
+        </LineChart>
       </ResponsiveContainer>
     </div>
   )

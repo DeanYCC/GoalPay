@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -16,16 +16,100 @@ const Reports: React.FC = () => {
   const [customEndDate, setCustomEndDate] = useState('');
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [dateError, setDateError] = useState('');
+
+  // 驗證自訂日期範圍
+  const validateCustomDateRange = () => {
+    if (!customStartDate || !customEndDate) {
+      setDateError(t('reports.pleaseSelectBothDates'));
+      return false;
+    }
+    
+    if (customStartDate > customEndDate) {
+      setDateError(t('reports.startDateCannotBeAfterEndDate'));
+      return false;
+    }
+    
+    const startDate = new Date(customStartDate);
+    const endDate = new Date(customEndDate);
+    const today = new Date();
+    
+    if (endDate > today) {
+      setDateError(t('reports.endDateCannotBeInFuture'));
+      return false;
+    }
+    
+    setDateError('');
+    return true;
+  };
+
+  // 根據選擇的時間區間計算日期範圍
+  const getDateRange = () => {
+    const now = new Date();
+    let startDate = '';
+    let endDate = now.toISOString().split('T')[0];
+
+    switch (selectedPeriod) {
+      case '1m':
+        startDate = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0];
+        break;
+      case '3m':
+        startDate = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString().split('T')[0];
+        break;
+      case '6m':
+        startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0];
+        break;
+      case '1y':
+        startDate = new Date(now.getFullYear(), 0, 1).toISOString().split('T')[0];
+        break;
+      case 'custom':
+        if (customStartDate && customEndDate) {
+          startDate = customStartDate;
+          endDate = customEndDate;
+        } else {
+          // 如果自訂日期未設置，使用預設的6個月
+          startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0];
+        }
+        break;
+      default:
+        startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1).toISOString().split('T')[0];
+    }
+
+    return { startDate, endDate };
+  };
+
+  const { startDate, endDate } = getDateRange();
 
   // 獲取報告數據
-  const { data: reportsData, isLoading } = useQuery({
-    queryKey: ['reports', selectedPeriod],
+  const { data: reportsData, isLoading, refetch } = useQuery({
+    queryKey: ['reports', selectedPeriod, startDate, endDate],
     queryFn: async () => {
-      const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
-      return response.data;
+      try {
+        // 如果有自訂日期範圍，使用報告 API
+        if (selectedPeriod === 'custom' && customStartDate && customEndDate) {
+          const response = await axios.get(API_ENDPOINTS.REPORTS.CUSTOM_RANGE(customStartDate, customEndDate));
+          return response.data;
+        } else {
+          // 否則使用儀表板測試數據
+          const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
+          return response.data;
+        }
+      } catch (error) {
+        console.error('Failed to fetch reports data:', error);
+        // 如果 API 失敗，返回測試數據作為後備
+        const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
+        return response.data;
+      }
     },
-    enabled: true,
+    staleTime: 30000, // 添加緩存時間
   });
+
+  // 當自訂日期改變時重新獲取數據
+  useEffect(() => {
+    if (selectedPeriod === 'custom' && customStartDate && customEndDate) {
+      refetch();
+    }
+  }, [customStartDate, customEndDate, selectedPeriod, refetch]);
 
   if (isLoading) {
     return (
@@ -155,8 +239,10 @@ const Reports: React.FC = () => {
                           setCustomStartDate(e.target.value);
                           if (e.target.value && customEndDate) {
                             setSelectedPeriod('custom');
+                            validateCustomDateRange();
                           }
                         }}
+                        max={new Date().toISOString().split('T')[0]}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                     </div>
@@ -172,18 +258,28 @@ const Reports: React.FC = () => {
                           setCustomEndDate(e.target.value);
                           if (customStartDate && e.target.value) {
                             setSelectedPeriod('custom');
+                            validateCustomDateRange();
                           }
                         }}
+                        max={new Date().toISOString().split('T')[0]}
                         className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                       />
                     </div>
                   </div>
+                  
+                  {/* 錯誤訊息顯示 */}
+                  {dateError && (
+                    <div className="mt-2 p-2 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-700 rounded-md">
+                      <p className="text-sm text-red-600 dark:text-red-400">{dateError}</p>
+                    </div>
+                  )}
                   
                   <button 
                     onClick={() => {
                       setCustomStartDate('');
                       setCustomEndDate('');
                       setSelectedPeriod('6m');
+                      setDateError('');
                     }}
                     className="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors"
                   >
@@ -213,7 +309,7 @@ const Reports: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.totalIncome')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ¥{reportsData?.summary?.monthlyIncome?.toLocaleString() || '0'}
+                ¥{reportsData?.summary?.totalIncome?.toLocaleString() || '0'}
               </p>
             </div>
           </div>
@@ -241,7 +337,7 @@ const Reports: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('dashboard.totalDeductions')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ¥{reportsData?.summary?.monthlyDeductions?.toLocaleString() || '0'}
+                ¥{reportsData?.summary?.totalDeductions?.toLocaleString() || '0'}
               </p>
             </div>
           </div>
@@ -270,14 +366,15 @@ const Reports: React.FC = () => {
             {t('reports.salaryTrend')}
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={reportsData?.taxHistory || []}>
+            <LineChart data={reportsData?.chartData || []}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="month" />
               <YAxis />
               <Tooltip />
               <Legend />
               <Line type="monotone" dataKey="income" stroke="#8884d8" name={t('reports.income')} />
-              <Line type="monotone" dataKey="tax" stroke="#82ca9d" name={t('reports.tax')} />
+              <Line type="monotone" dataKey="deductions" stroke="#82ca9d" name={t('reports.tax')} />
+              <Line type="monotone" dataKey="net" stroke="#ffc658" name={t('dashboard.netIncome')} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -352,10 +449,10 @@ const Reports: React.FC = () => {
                     {payroll.slipDate}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    ¥{payroll.items?.filter((item: any) => item.item_type === 'income').reduce((sum: number, item: any) => sum + item.amount, 0)?.toLocaleString() || '0'}
+                    ¥{payroll.items?.filter((item: any) => item.item_type === 'income')?.reduce((sum: number, item: any) => sum + item.amount, 0)?.toLocaleString() || '0'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    ¥{payroll.items?.filter((item: any) => item.item_type === 'deduction').reduce((sum: number, item: any) => sum + item.amount, 0)?.toLocaleString() || '0'}
+                    ¥{payroll.items?.filter((item: any) => item.item_type === 'deduction')?.reduce((sum: number, item: any) => sum + item.amount, 0)?.toLocaleString() || '0'}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600 dark:text-green-400">
                     ¥{payroll.netIncome?.toLocaleString()}

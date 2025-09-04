@@ -28,8 +28,8 @@ const CompanySelector: React.FC<CompanySelectorProps> = ({
   });
 
   const filteredCompanies = showCurrentOnly 
-    ? companies.filter(company => company.isCurrent)
-    : companies;
+    ? companies?.filter(company => company.isCurrent) || []
+    : companies || [];
 
   const selectedCompany = companies.find(company => company.id === selectedCompanyId);
 

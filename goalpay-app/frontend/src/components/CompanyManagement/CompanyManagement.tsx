@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { companyService } from '../../services/companyService';
 import { Company, CreateCompanyRequest } from '../../types/company';
 import { Plus, Edit, Trash2, Building, Calendar, User, Briefcase } from 'lucide-react';
@@ -14,7 +14,7 @@ const CompanyManagement: React.FC<CompanyManagementProps> = ({
   onCompanySelect, 
   showCurrentOnly = false 
 }) => {
-  const { t } = useLanguage();
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
   const [editingCompany, setEditingCompany] = useState<Company | null>(null);
@@ -133,8 +133,8 @@ const CompanyManagement: React.FC<CompanyManagementProps> = ({
   };
 
   const filteredCompanies = showCurrentOnly 
-    ? companies.filter(company => company.isCurrent)
-    : companies;
+    ? companies?.filter(company => company.isCurrent) || []
+    : companies || [];
 
   if (isLoading) {
     return <div className="text-center py-8">{t('common.loading')}</div>;

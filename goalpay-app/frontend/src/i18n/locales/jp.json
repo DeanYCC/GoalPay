@@ -108,7 +108,13 @@
     "editItem": "項目を編集",
     "category": "カテゴリ",
     "selectItem": "項目を選択",
-    "searchItems": "項目を検索..."
+    "searchItems": "項目を検索...",
+    "setAsDefault": "デフォルトに設定",
+    "cancel": "キャンセル",
+    "save": "保存",
+    "chineseDescription": "中国語の説明",
+    "englishDescription": "英語の説明",
+    "japaneseDescription": "日本語の説明"
   },
   "reports": {
     "subtitle": "給与分析とレポート",
@@ -148,6 +154,8 @@
     "payrollItemManagement": "給与項目管理",
     "fullName": "氏名",
     "email": "メールアドレス",
+    "enterFullName": "氏名を入力してください",
+    "enterEmail": "メールアドレスを入力してください",
     "language": "言語",
     "selectLanguage": "言語を選択",
     "theme": "テーマ",

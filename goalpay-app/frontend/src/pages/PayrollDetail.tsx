@@ -145,7 +145,7 @@ const PayrollDetail: React.FC = () => {
       
       setPayrollData({
         ...payrollData,
-        items: [...payrollData.items, item]
+        items: [...(payrollData.items || []), item]
       });
       
       setNewItem({
@@ -157,24 +157,24 @@ const PayrollDetail: React.FC = () => {
   };
 
   const removeItem = (itemId: number) => {
-    if (payrollData) {
+    if (payrollData && payrollData.items) {
       setPayrollData({
         ...payrollData,
-        items: payrollData.items.filter(item => item.id !== itemId)
+        items: payrollData.items?.filter(item => item.id !== itemId) || []
       });
     }
   };
 
   const calculateNetIncome = () => {
-    if (!payrollData) return 0;
+    if (!payrollData || !payrollData.items) return 0;
     
     const totalIncome = payrollData.items
-      .filter(item => item.item_type === 'income')
-      .reduce((sum, item) => sum + item.amount, 0);
+      ?.filter(item => item.item_type === 'income')
+      ?.reduce((sum, item) => sum + item.amount, 0) || 0;
     
     const totalDeductions = payrollData.items
-      .filter(item => item.item_type === 'deduction')
-      .reduce((sum, item) => sum + item.amount, 0);
+      ?.filter(item => item.item_type === 'deduction')
+      ?.reduce((sum, item) => sum + item.amount, 0) || 0;
     
     return totalIncome - totalDeductions;
   };
@@ -415,7 +415,7 @@ const PayrollDetail: React.FC = () => {
 
         {/* 項目列表 */}
         <div className="space-y-4">
-          {payrollData.items.map((item) => (
+          {payrollData.items && payrollData.items.map((item) => (
             <div
               key={item.id}
               className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg"
@@ -461,25 +461,25 @@ const PayrollDetail: React.FC = () => {
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.totalIncome')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.totalIncome')}</p>
             <p className="text-2xl font-bold text-green-600 dark:text-green-400">
-              ¥{payrollData.items
-                .filter(item => item.item_type === 'income')
-                .reduce((sum, item) => sum + item.amount, 0)
-                .toLocaleString()}
+              ¥{(payrollData.items || [])
+                ?.filter(item => item.item_type === 'income')
+                ?.reduce((sum, item) => sum + item.amount, 0)
+                ?.toLocaleString() || '0'}
             </p>
           </div>
           <div className="text-center">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.totalDeductions')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.totalDeductions')}</p>
             <p className="text-2xl font-bold text-red-600 dark:text-red-400">
-              ¥{payrollData.items
-                .filter(item => item.item_type === 'deduction')
-                .reduce((sum, item) => sum + item.amount, 0)
-                .toLocaleString()}
+              ¥{(payrollData.items || [])
+                ?.filter(item => item.item_type === 'deduction')
+                ?.reduce((sum, item) => sum + item.amount, 0)
+                ?.toLocaleString() || '0'}
             </p>
           </div>
           <div className="text-center">
-                            <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.netIncome')}</p>
+            <p className="text-sm text-gray-600 dark:text-gray-400">{t('payroll.netIncome')}</p>
             <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
               ¥{netIncome.toLocaleString()}
             </p>

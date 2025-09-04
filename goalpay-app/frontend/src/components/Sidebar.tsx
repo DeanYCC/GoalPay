@@ -1,6 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import { 
   BarChart3, 
   Upload, 
@@ -10,7 +10,7 @@ import {
 } from 'lucide-react'
 
 const Sidebar: React.FC = () => {
-  const { t } = useLanguage()
+  const { t } = useTranslation()
 
   const navigationItems = [
     {

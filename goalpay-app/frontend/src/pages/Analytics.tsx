@@ -17,7 +17,8 @@ const Analytics: React.FC = () => {
       const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
       return response.data;
     },
-    enabled: true,
+    // 移除不必要的 enabled: true
+    staleTime: 30000, // 添加緩存時間
   });
 
   if (isLoading) {
@@ -70,7 +71,7 @@ const Analytics: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.averageMonthlyIncome')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ¥{analyticsData?.summary?.monthlyIncome?.toLocaleString() || '0'}
+                ¥{analyticsData?.summary?.totalIncome?.toLocaleString() || '0'}
               </p>
             </div>
           </div>
@@ -84,7 +85,7 @@ const Analytics: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.growthRate')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                +{analyticsData?.summary?.growthRate || '0'}%
+                +{analyticsData?.summary?.monthlyGrowth || '0'}%
               </p>
             </div>
           </div>
@@ -98,7 +99,7 @@ const Analytics: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.averageDeductions')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ¥{analyticsData?.summary?.monthlyDeductions?.toLocaleString() || '0'}
+                ¥{analyticsData?.summary?.totalDeductions?.toLocaleString() || '0'}
               </p>
             </div>
           </div>

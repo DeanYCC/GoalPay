@@ -24,8 +24,30 @@ export default function handler(req, res) {
       netIncome: 365000,
       monthlyAverage: 365000,
       monthlyGrowth: 2.5,
-      currency: 'JPY'
+      currency: 'JPY',
+      // 為 Analytics 組件添加的字段
+      monthlyIncome: 450000,
+      monthlyDeductions: 85000,
+      growthRate: 2.5
     },
+    // 為 Analytics 組件添加的稅收歷史數據
+    taxHistory: [
+      { month: '2024-01', income: 350000, tax: 35000, deductions: 70000 },
+      { month: '2024-02', income: 360000, tax: 36000, deductions: 72000 },
+      { month: '2024-03', income: 370000, tax: 37000, deductions: 74000 },
+      { month: '2024-04', income: 380000, tax: 38000, deductions: 76000 },
+      { month: '2024-05', income: 390000, tax: 39000, deductions: 78000 },
+      { month: '2024-06', income: 400000, tax: 40000, deductions: 80000 }
+    ],
+    // 為 SalaryChart 組件添加的圖表數據
+    chartData: [
+      { month: '2024-01', income: 350000, deductions: 70000, net: 280000 },
+      { month: '2024-02', income: 360000, deductions: 72000, net: 288000 },
+      { month: '2024-03', income: 370000, deductions: 74000, net: 296000 },
+      { month: '2024-04', income: 380000, deductions: 76000, net: 304000 },
+      { month: '2024-05', income: 390000, deductions: 78000, net: 312000 },
+      { month: '2024-06', income: 400000, deductions: 80000, net: 320000 }
+    ],
     recentPayrolls: [
       {
         id: 1,

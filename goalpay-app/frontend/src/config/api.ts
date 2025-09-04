@@ -30,6 +30,15 @@ export const API_ENDPOINTS = {
     TEST_DATA: `${API_BASE_URL}/api/dashboard/test-data`,
   },
   
+  // 報告相關
+  REPORTS: {
+    SUMMARY: `${API_BASE_URL}/api/reports/summary`,
+    EXPORT_PDF: `${API_BASE_URL}/api/reports/export/pdf`,
+    EXPORT_CSV: `${API_BASE_URL}/api/reports/export/csv`,
+    CUSTOM_RANGE: (startDate: string, endDate: string) => 
+      `${API_BASE_URL}/api/reports/summary?startDate=${startDate}&endDate=${endDate}`,
+  },
+  
   // 薪資相關
   PAYROLL: {
     LIST: `${API_BASE_URL}/api/payroll`,

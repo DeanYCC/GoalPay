@@ -39,13 +39,15 @@ const RecentPayrolls: React.FC<RecentPayrollsProps> = ({ payrolls, isLoading }) 
   }
 
   const calculateNetIncome = (items: PayrollItem[]) => {
+    if (!items || !Array.isArray(items)) return 0;
+    
     const income = items
-      .filter(item => item.item_type === 'income')
-      .reduce((sum, item) => sum + item.amount, 0)
+      ?.filter(item => item.item_type === 'income')
+      ?.reduce((sum, item) => sum + item.amount, 0) || 0
     
     const deductions = items
-      .filter(item => item.item_type === 'deduction')
-      .reduce((sum, item) => sum + item.amount, 0)
+      ?.filter(item => item.item_type === 'deduction')
+      ?.reduce((sum, item) => sum + item.amount, 0) || 0
     
     return income - deductions
   }

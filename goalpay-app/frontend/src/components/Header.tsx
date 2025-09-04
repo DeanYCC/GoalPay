@@ -1,14 +1,14 @@
 import React from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import { Moon, Sun, LogOut, User } from 'lucide-react'
 import LanguageSelector from './LanguageSelector'
 
 const Header: React.FC = () => {
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
-  const { t } = useLanguage()
+  const { t } = useTranslation()
 
   return (
     <header className="bg-card border-b border-border px-6 py-4">

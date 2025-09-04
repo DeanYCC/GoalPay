@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import { ChevronDown, Globe } from 'lucide-react'
 
 const LanguageSelector: React.FC = () => {
-  const { language, setLanguage, t } = useLanguage()
+  const { t, i18n } = useTranslation()
   const [isOpen, setIsOpen] = useState(false)
 
   const languages = [
@@ -12,7 +12,7 @@ const LanguageSelector: React.FC = () => {
     { code: 'jp', name: t('settings.japanese'), flag: '🇯🇵' },
   ]
 
-  const currentLanguage = languages.find(lang => lang.code === language)
+  const currentLanguage = languages.find(lang => lang.code === i18n.language)
 
   return (
     <div className="relative">
@@ -34,11 +34,11 @@ const LanguageSelector: React.FC = () => {
               <button
                 key={lang.code}
                 onClick={() => {
-                  setLanguage(lang.code as 'zh' | 'en' | 'jp')
+                  i18n.changeLanguage(lang.code)
                   setIsOpen(false)
                 }}
                 className={`w-full flex items-center gap-3 px-4 py-2 text-left hover:bg-muted transition-colors ${
-                  language === lang.code
+                  i18n.language === lang.code
                     ? 'bg-primary text-primary-foreground'
                     : 'text-card-foreground'
                 }`}

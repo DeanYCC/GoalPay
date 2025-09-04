@@ -108,10 +108,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(userData));
       axios.defaults.headers.common['Authorization'] = `Bearer ${userToken}`;
       
-      // 強制觸發重新渲染
-      setTimeout(() => {
-        console.log('AuthContext: 用戶狀態已更新');
-      }, 0);
+      // 移除無效的 setTimeout
+      console.log('AuthContext: 用戶狀態已更新');
     } else {
       // Google OAuth 登入
       window.location.href = API_ENDPOINTS.AUTH.GOOGLE;

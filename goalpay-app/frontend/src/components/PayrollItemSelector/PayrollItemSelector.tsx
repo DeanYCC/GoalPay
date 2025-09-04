@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ChevronDown, Plus, Info } from 'lucide-react';
 import { PayrollItemTemplate, getItemTemplates, getItemName, getItemCategory } from '../../types/payrollItem';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 interface PayrollItemSelectorProps {
   type: 'income' | 'deduction';
@@ -16,15 +16,15 @@ const PayrollItemSelector: React.FC<PayrollItemSelectorProps> = ({
   placeholder = "選擇項目",
   disabled = false
 }) => {
-  const { currentLanguage, t } = useLanguage();
+  const { t, i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
   const templates = getItemTemplates(type);
   const filteredTemplates = templates.filter(item => 
-    getItemName(item, currentLanguage).toLowerCase().includes(searchTerm.toLowerCase()) ||
-    getItemCategory(item, currentLanguage).toLowerCase().includes(searchTerm.toLowerCase())
+    getItemName(item, i18n.language).toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getItemCategory(item, i18n.language).toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleSelect = (item: PayrollItemTemplate) => {
@@ -34,11 +34,11 @@ const PayrollItemSelector: React.FC<PayrollItemSelectorProps> = ({
   };
 
   const getDescription = (item: PayrollItemTemplate) => {
-    return item.description[currentLanguage as keyof typeof item.description] || item.description.zh;
+    return item.description[i18n.language as keyof typeof item.description] || item.description.zh;
   };
 
   const groupedTemplates = filteredTemplates.reduce((groups, item) => {
-    const category = getItemCategory(item, currentLanguage);
+    const category = getItemCategory(item, i18n.language);
     if (!groups[category]) {
       groups[category] = [];
     }
@@ -65,6 +65,8 @@ const PayrollItemSelector: React.FC<PayrollItemSelectorProps> = ({
           {/* 搜尋框 */}
           <div className="p-2 border-b border-border">
             <input
+              id="searchItems"
+              name="searchItems"
               type="text"
               placeholder={t('payrollItem.searchItems')}
               value={searchTerm}
@@ -92,7 +94,7 @@ const PayrollItemSelector: React.FC<PayrollItemSelectorProps> = ({
                       onClick={() => handleSelect(item)}
                       className="w-full flex items-center justify-between px-3 py-2 text-left hover:bg-muted"
                     >
-                      <span className="font-medium">{getItemName(item, currentLanguage)}</span>
+                      <span className="font-medium">{getItemName(item, i18n.language)}</span>
                       <div className="flex items-center gap-2">
                         {item.isDefault && (
                           <span className="text-xs text-primary bg-primary/10 px-1 rounded">
@@ -123,9 +125,9 @@ const PayrollItemSelector: React.FC<PayrollItemSelectorProps> = ({
               onClick={() => {
                 const customItem: PayrollItemTemplate = {
                   id: `custom_${Date.now()}`,
-                  name: searchTerm || '自訂項目',
+                  name: searchTerm || t('payrollItem.customCategory'),
                   type,
-                  category: '自訂項目',
+                  category: t('payrollItem.customCategory'),
                   isDefault: false
                 };
                 handleSelect(customItem);
@@ -133,7 +135,7 @@ const PayrollItemSelector: React.FC<PayrollItemSelectorProps> = ({
               className="w-full flex items-center justify-center gap-2 px-3 py-2 text-sm text-primary hover:bg-primary/10 rounded"
             >
               <Plus className="w-4 h-4" />
-              新增自訂項目
+              {t('payrollItem.addCustomItem')}
             </button>
           </div>
         </div>

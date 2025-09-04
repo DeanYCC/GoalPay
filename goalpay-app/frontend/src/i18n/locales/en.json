@@ -108,7 +108,13 @@
     "editItem": "Edit Item",
     "category": "Category",
     "selectItem": "Select Item",
-    "searchItems": "Search items..."
+    "searchItems": "Search items...",
+    "setAsDefault": "Set as Default",
+    "cancel": "Cancel",
+    "save": "Save",
+    "chineseDescription": "Chinese Description",
+    "englishDescription": "English Description",
+    "japaneseDescription": "Japanese Description"
   },
   "reports": {
     "subtitle": "Salary Analysis and Reports",
@@ -148,6 +154,8 @@
     "payrollItemManagement": "Payroll Item Management",
     "fullName": "Full Name",
     "email": "Email",
+    "enterFullName": "Enter your full name",
+    "enterEmail": "Enter your email address",
     "language": "Language",
     "selectLanguage": "Select Language",
     "theme": "Theme",

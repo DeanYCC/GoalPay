@@ -9,6 +9,7 @@ import RecentPayrolls from '../components/dashboard/RecentPayrolls';
 import SalaryTerms from '../components/SalaryTerms/SalaryTerms';
 import { TrendingUp, TrendingDown, DollarSign, Calculator } from 'lucide-react';
 import { API_ENDPOINTS } from '../config/api';
+import { payrollCalculations } from '../services/companyService';
 
 const Dashboard: React.FC = () => {
   const { t } = useTranslation();
@@ -22,17 +23,19 @@ const Dashboard: React.FC = () => {
       const userData = JSON.parse(user);
       setIsTestUser(userData.email === 'test@goalpay.com');
     }
+
+    // 在開發環境中運行計算測試（僅一次）
+    if (process.env.NODE_ENV === 'development') {
+      payrollCalculations.runTests();
+    }
   }, []);
 
   // 獲取儀表板數據
   const { data: dashboardData, isLoading, error } = useQuery({
     queryKey: ['dashboardData', isTestUser],
     queryFn: async () => {
-      // 直接檢查localStorage中的用戶數據
-      const user = localStorage.getItem('user');
-      const isTest = user ? JSON.parse(user).email === 'test@goalpay.com' : false;
-      
-      if (isTest) {
+      // 使用狀態中的 isTestUser，避免重複檢查 localStorage
+      if (isTestUser) {
         // 使用測試數據端點
         const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
         return response.data;
@@ -42,8 +45,9 @@ const Dashboard: React.FC = () => {
         return response.data;
       }
     },
-    enabled: true,
-    refetchInterval: 30000, // 每30秒刷新一次
+    // 移除不必要的 enabled: true
+    refetchInterval: 60000, // 改為每60秒刷新一次，減少頻率
+    staleTime: 30000, // 添加 staleTime，30秒內不重新獲取
   });
 
   if (isLoading) {
@@ -86,6 +90,18 @@ const Dashboard: React.FC = () => {
 
   const summary = dashboardData?.summary || dashboardData;
   const recentPayrolls = dashboardData?.recentPayrolls || [];
+
+  // 驗證薪資單數據
+  const validationResults = recentPayrolls?.map(payroll => ({
+    id: payroll.id,
+    ...payrollCalculations.validatePayrollData(payroll)
+  })) || [];
+
+  // 檢查是否有驗證錯誤
+  const hasValidationErrors = validationResults?.some(result => !result.isValid) || false;
+  if (hasValidationErrors) {
+    console.warn('薪資單數據驗證錯誤:', validationResults?.filter(result => !result.isValid) || []);
+  }
 
   return (
     <div className="p-6 space-y-6">
@@ -144,12 +160,15 @@ const Dashboard: React.FC = () => {
 
       {/* 圖表和最近薪資單 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <SalaryChart data={summary} />
+        <SalaryChart data={dashboardData?.chartData || []} />
         <RecentPayrolls payrolls={recentPayrolls} />
       </div>
 
       {/* 快速操作 */}
-      <QuickActions onShowSalaryTerms={() => setShowSalaryTerms(true)} />
+      <QuickActions 
+        onShowSalaryTerms={() => setShowSalaryTerms(true)} 
+        validationResults={validationResults}
+      />
 
       {/* 薪資條款模態框 */}
       {showSalaryTerms && (

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { X, Info } from 'lucide-react';
 
 interface SalaryTerm {
@@ -192,13 +192,13 @@ interface SalaryTermsProps {
 }
 
 const SalaryTerms: React.FC<SalaryTermsProps> = ({ isOpen, onClose }) => {
-  const { currentLanguage, t } = useLanguage();
+  const { t, i18n } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
 
   if (!isOpen) return null;
 
   const getTermName = (term: SalaryTerm) => {
-    switch (currentLanguage) {
+    switch (i18n.language) {
       case 'en': return term.en;
       case 'jp': return term.jp;
       default: return term.zh;
@@ -206,7 +206,7 @@ const SalaryTerms: React.FC<SalaryTermsProps> = ({ isOpen, onClose }) => {
   };
 
   const getTermDescription = (term: SalaryTerm) => {
-    switch (currentLanguage) {
+    switch (i18n.language) {
       case 'en': return term.description_en;
       case 'jp': return term.description_jp;
       default: return term.description_zh;
@@ -220,9 +220,9 @@ const SalaryTerms: React.FC<SalaryTermsProps> = ({ isOpen, onClose }) => {
     term.jp.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // 根據語言獲取標題和提示文字
+    // 根據語言獲取標題和提示文字
   const getTitle = () => {
-    switch (currentLanguage) {
+    switch (i18n.language) {
       case 'en': return 'Salary Terms Guide';
       case 'jp': return '給与項目ガイド';
       default: return '薪資條款說明';
@@ -230,7 +230,7 @@ const SalaryTerms: React.FC<SalaryTermsProps> = ({ isOpen, onClose }) => {
   };
 
   const getSearchPlaceholder = () => {
-    switch (currentLanguage) {
+    switch (i18n.language) {
       case 'en': return 'Search terms...';
       case 'jp': return '項目を検索...';
       default: return '搜尋條款...';
@@ -238,7 +238,7 @@ const SalaryTerms: React.FC<SalaryTermsProps> = ({ isOpen, onClose }) => {
   };
 
   const getNoResultsText = () => {
-    switch (currentLanguage) {
+    switch (i18n.language) {
       case 'en': return 'No salary terms found';
       case 'jp': return '該当する給与項目が見つかりません';
       default: return '沒有找到相關的薪資條款';

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 import { PayrollItemTemplate, DEFAULT_PAYROLL_ITEMS, getItemName, getItemCategory } from '../../types/payrollItem';
 import { Plus, Edit, Trash2, Info, Save, X } from 'lucide-react';
 
@@ -8,7 +8,7 @@ interface PayrollItemManagerProps {
 }
 
 const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
-  const { t, language } = useLanguage();
+  const { t, i18n } = useTranslation();
   const [items, setItems] = useState<PayrollItemTemplate[]>(DEFAULT_PAYROLL_ITEMS);
   const [editingItem, setEditingItem] = useState<PayrollItemTemplate | null>(null);
   const [showForm, setShowForm] = useState(false);
@@ -39,7 +39,7 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
 
   const handleDelete = (id: string) => {
     if (window.confirm(t('payrollItem.confirmDelete'))) {
-      setItems(items.filter(item => item.id !== id));
+      setItems(items?.filter(item => item.id !== id) || []);
     }
   };
 
@@ -61,7 +61,7 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
   };
 
   const getDescription = (item: PayrollItemTemplate) => {
-    return item.description[currentLanguage as keyof typeof item.description] || item.description.zh;
+    return item.description[i18n.language as keyof typeof item.description] || item.description.zh;
   };
 
   const groupedItems = items.reduce((groups, item) => {
@@ -74,8 +74,7 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-semibold">{t('settings.payrollItemManagement')}</h3>
+      <div className="flex justify-end">
         <button
           onClick={handleAddCustom}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
@@ -89,7 +88,7 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
       <div className="space-y-6">
         {Object.entries(groupedItems).map(([category, categoryItems]) => (
           <div key={category} className="border border-border rounded-lg p-4">
-            <h4 className="text-md font-medium mb-3">{getItemCategory(categoryItems[0], language)}</h4>
+            <h4 className="text-md font-medium mb-3">{getItemCategory(categoryItems[0], i18n.language)}</h4>
             <div className="grid gap-3">
               {categoryItems.map((item) => (
                 <div
@@ -104,7 +103,7 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
                     }`}>
                       {item.type === 'income' ? t('payroll.income') : t('payroll.deduction')}
                     </div>
-                    <span className="font-medium">{getItemName(item, language)}</span>
+                    <span className="font-medium">{getItemName(item, i18n.language)}</span>
                     {item.isDefault && (
                       <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 rounded-full">
                         {t('payrollItem.default')}
@@ -166,8 +165,10 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('payroll.itemName')} *</label>
+                  <label htmlFor="itemName" className="block text-sm font-medium mb-1">{t('payroll.itemName')} *</label>
                   <input
+                    id="itemName"
+                    name="itemName"
                     type="text"
                     value={editingItem.name}
                     onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
@@ -177,8 +178,10 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-1">{t('payroll.type')}</label>
+                  <label htmlFor="itemType" className="block text-sm font-medium mb-1">{t('payroll.type')}</label>
                   <select
+                    id="itemType"
+                    name="itemType"
                     value={editingItem.type}
                     onChange={(e) => setEditingItem({...editingItem, type: e.target.value as 'income' | 'deduction'})}
                     className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
@@ -190,8 +193,10 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">{t('payrollItem.category')}</label>
+                <label htmlFor="itemCategory" className="block text-sm font-medium mb-1">{t('payrollItem.category')}</label>
                 <input
+                  id="itemCategory"
+                  name="itemCategory"
                   type="text"
                   value={editingItem.category}
                   onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}
@@ -200,8 +205,10 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">中文說明</label>
+                <label htmlFor="chineseDescription" className="block text-sm font-medium mb-1">{t('payrollItem.chineseDescription')}</label>
                 <textarea
+                  id="chineseDescription"
+                  name="chineseDescription"
                   value={editingItem.description.zh}
                   onChange={(e) => setEditingItem({
                     ...editingItem, 
@@ -213,8 +220,10 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">英文說明</label>
+                <label htmlFor="englishDescription" className="block text-sm font-medium mb-1">{t('payrollItem.englishDescription')}</label>
                 <textarea
+                  id="englishDescription"
+                  name="englishDescription"
                   value={editingItem.description.en}
                   onChange={(e) => setEditingItem({
                     ...editingItem, 
@@ -226,8 +235,10 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">日文說明</label>
+                <label htmlFor="japaneseDescription" className="block text-sm font-medium mb-1">{t('payrollItem.japaneseDescription')}</label>
                 <textarea
+                  id="japaneseDescription"
+                  name="japaneseDescription"
                   value={editingItem.description.jp}
                   onChange={(e) => setEditingItem({
                     ...editingItem, 
@@ -260,13 +271,13 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
                 }}
                 className="px-4 py-2 border border-border rounded-lg hover:bg-muted"
               >
-                取消
+                {t('payrollItem.cancel')}
               </button>
               <button
                 onClick={handleSave}
                 className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
               >
-                儲存
+                {t('payrollItem.save')}
               </button>
             </div>
           </div>

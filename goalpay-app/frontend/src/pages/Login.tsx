@@ -2,15 +2,13 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useTranslation } from 'react-i18next';
-import { useLanguage } from '../contexts/LanguageContext';
 import { Globe } from 'lucide-react';
 import { API_ENDPOINTS } from '../config/api';
 
 const Login: React.FC = () => {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { t } = useTranslation();
-  const { currentLanguage, setLanguage } = useLanguage();
+  const { t, i18n } = useTranslation();
   const [showLanguageSelector, setShowLanguageSelector] = useState(false);
 
   // 點擊外部關閉語言選擇器
@@ -66,8 +64,7 @@ const Login: React.FC = () => {
       login(testUser, testToken);
       console.log('登入成功，準備導航到儀表板...');
       
-      // 使用window.location.href而不是navigate
-     
+      // 使用 navigate 進行導航
       navigate('/dashboard');
     } catch (error) {
       console.error('測試登入失敗:', error);
@@ -85,7 +82,7 @@ const Login: React.FC = () => {
         >
           <Globe className="w-4 h-4" />
           <span className="text-sm">
-            {currentLanguage === 'zh' ? '中文' : currentLanguage === 'en' ? 'English' : '日本語'}
+            {i18n.language === 'zh' ? '中文' : i18n.language === 'en' ? 'English' : '日本語'}
           </span>
         </button>
         
@@ -93,11 +90,11 @@ const Login: React.FC = () => {
           <div className="absolute top-full right-0 mt-2 bg-white/10 backdrop-blur-sm rounded-lg p-2 space-y-1 min-w-[120px] z-50">
             <button
               onClick={() => {
-                setLanguage('zh');
+                i18n.changeLanguage('zh');
                 setShowLanguageSelector(false);
               }}
               className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                currentLanguage === 'zh' 
+                i18n.language === 'zh' 
                   ? 'bg-white/20 text-white' 
                   : 'text-gray-300 hover:bg-white/10'
               }`}
@@ -106,11 +103,11 @@ const Login: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                setLanguage('en');
+                i18n.changeLanguage('en');
                 setShowLanguageSelector(false);
               }}
               className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                currentLanguage === 'en' 
+                i18n.language === 'en' 
                   ? 'bg-white/20 text-white' 
                   : 'text-gray-300 hover:bg-white/10'
               }`}
@@ -119,11 +116,11 @@ const Login: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                setLanguage('jp');
+                i18n.changeLanguage('jp');
                 setShowLanguageSelector(false);
               }}
               className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                currentLanguage === 'jp' 
+                i18n.language === 'jp' 
                   ? 'bg-white/20 text-white' 
                   : 'text-gray-300 hover:bg-white/10'
               }`}

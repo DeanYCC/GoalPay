@@ -116,7 +116,13 @@
     "editItem": "編輯項目",
     "category": "分類",
     "selectItem": "選擇項目",
-    "searchItems": "搜尋項目..."
+    "searchItems": "搜尋項目...",
+    "setAsDefault": "設為預設",
+    "cancel": "取消",
+    "save": "儲存",
+    "chineseDescription": "中文說明",
+    "englishDescription": "英文說明",
+    "japaneseDescription": "日文說明"
   },
   "reports": {
     "subtitle": "薪資分析和報告",
@@ -144,7 +150,10 @@
     "overtime": "加班費",
     "allowance": "津貼",
     "payslipDetails": "薪資單詳細",
-    "date": "日期"
+    "date": "日期",
+    "pleaseSelectBothDates": "請選擇開始和結束日期",
+    "startDateCannotBeAfterEndDate": "開始日期不能晚於結束日期",
+    "endDateCannotBeInFuture": "結束日期不能是未來日期"
   },
   "settings": {
     "title": "設定",
@@ -156,6 +165,8 @@
     "payrollItemManagement": "薪資項目管理",
     "fullName": "姓名",
     "email": "電子郵件",
+    "enterFullName": "請輸入您的姓名",
+    "enterEmail": "請輸入您的電子郵件",
     "language": "語言",
     "selectLanguage": "選擇語言",
     "theme": "主題",

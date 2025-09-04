@@ -2,14 +2,14 @@ import React from 'react'
 import { Outlet, useLocation, Navigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import Sidebar from './Sidebar'
 import Header from './Header'
 
 const Layout: React.FC = () => {
   const { user } = useAuth()
   const { theme } = useTheme()
-  const { language } = useLanguage()
+  const { i18n } = useTranslation()
   const location = useLocation()
 
   console.log('Layout: 當前用戶狀態', user);

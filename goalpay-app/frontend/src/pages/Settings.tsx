@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { useTheme } from '../contexts/ThemeContext'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import { User, Building, Palette, Globe, Calendar } from 'lucide-react'
 import CompanyManagement from '../components/CompanyManagement/CompanyManagement'
 import PayrollItemManager from '../components/PayrollItemManager/PayrollItemManager'
@@ -9,14 +9,16 @@ import PayrollItemManager from '../components/PayrollItemManager/PayrollItemMana
 const Settings: React.FC = () => {
   const { user, updateUser } = useAuth()
   const { theme, setTheme } = useTheme()
-  const { language, setLanguage, t } = useLanguage()
+  const { t, i18n } = useTranslation()
   
   const [isLoading, setIsLoading] = useState(false)
   const [settings, setSettings] = useState({
+    name: user?.name || '',
+    email: user?.email || '',
     company_name: user?.company_name || '',
     currency: user?.currency || 'JPY',
     theme: theme,
-    language: language,
+    language: i18n.language,
     paydayType: user?.paydayType || 'month_end',
     customPayday: user?.customPayday || 25,
     periodStartDay: user?.periodStartDay || 1,
@@ -34,6 +36,8 @@ const Settings: React.FC = () => {
     setIsLoading(true)
     try {
       await updateUser({
+        name: settings.name,
+        email: settings.email,
         company_name: settings.company_name,
         currency: settings.currency,
         paydayType: settings.paydayType,
@@ -44,7 +48,7 @@ const Settings: React.FC = () => {
       
       // 更新主題和語言
       setTheme(settings.theme as 'light' | 'dark')
-      setLanguage(settings.language as 'zh' | 'en' | 'jp')
+      i18n.changeLanguage(settings.language)
       
       // 顯示成功消息
       alert(t('settings.settingsSaved'))
@@ -80,26 +84,32 @@ const Settings: React.FC = () => {
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="fullName" className="block text-sm font-medium text-foreground mb-2">
                 {t('settings.fullName')}
               </label>
               <input
+                id="fullName"
+                name="fullName"
                 type="text"
-                value={user?.name || ''}
-                disabled
-                className="w-full px-3 py-2 border border-border rounded-lg bg-muted text-muted-foreground"
+                value={settings.name}
+                onChange={(e) => handleSettingChange('name', e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder={t('settings.enterFullName')}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
                 {t('settings.email')}
               </label>
               <input
+                id="email"
+                name="email"
                 type="email"
-                value={user?.email || ''}
-                disabled
-                className="w-full px-3 py-2 border border-border rounded-lg bg-muted text-muted-foreground"
+                value={settings.email}
+                onChange={(e) => handleSettingChange('email', e.target.value)}
+                className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                placeholder={t('settings.enterEmail')}
               />
             </div>
           </div>

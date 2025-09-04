@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useLanguage } from '../contexts/LanguageContext'
+import { useTranslation } from 'react-i18next'
 import { Upload as UploadIcon, FileText, Plus, X, Download, FileSpreadsheet } from 'lucide-react'
 import CompanySelector from '../components/CompanySelector/CompanySelector'
 import PayrollItemSelector from '../components/PayrollItemSelector/PayrollItemSelector'
@@ -8,7 +8,7 @@ import { getDefaultItems, PayrollItemTemplate } from '../types/payrollItem'
 import { API_ENDPOINTS } from '../config/api'
 
 const Upload: React.FC = () => {
-  const { t } = useLanguage()
+  const { t, i18n } = useTranslation()
   // 從 localStorage 恢復狀態
   const [isManualEntry, setIsManualEntry] = useState(() => {
     const saved = localStorage.getItem('upload_isManualEntry')
@@ -212,13 +212,12 @@ const Upload: React.FC = () => {
   }
 
   const handleItemSelect = (index: number, template: PayrollItemTemplate) => {
-    const { currentLanguage } = useLanguage()
     setPayrollData(prev => ({
       ...prev,
       items: prev.items.map((item, i) => 
         i === index ? { 
           ...item, 
-          item_name: typeof template.name === 'string' ? template.name : template.name[currentLanguage as keyof typeof template.name] || template.name.zh
+          item_name: typeof template.name === 'string' ? template.name : template.name[i18n.language as keyof typeof template.name] || template.name.zh
         } : item
       )
     }))
@@ -227,7 +226,7 @@ const Upload: React.FC = () => {
   const removeItem = (index: number) => {
     setPayrollData(prev => ({
       ...prev,
-      items: prev.items.filter((_, i) => i !== index)
+      items: prev.items?.filter((_, i) => i !== index) || []
     }))
   }
 
@@ -681,10 +680,12 @@ const Upload: React.FC = () => {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label htmlFor="employeeId" className="block text-sm font-medium text-foreground mb-2">
                   {t('payroll.employeeId')}
                 </label>
                 <input
+                  id="employeeId"
+                  name="employeeId"
                   type="text"
                   value={payrollData.employeeId}
                   onChange={(e) => handleInputChange('employeeId', e.target.value)}
@@ -694,10 +695,12 @@ const Upload: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label htmlFor="slipDate" className="block text-sm font-medium text-foreground mb-2">
                   {t('payroll.slipDate')}
                 </label>
                 <input
+                  id="slipDate"
+                  name="slipDate"
                   type="date"
                   value={payrollData.slipDate}
                   onChange={(e) => handleInputChange('slipDate', e.target.value)}
@@ -707,10 +710,12 @@ const Upload: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
+                <label htmlFor="paymentMethod" className="block text-sm font-medium text-foreground mb-2">
                   {t('payroll.paymentMethod')}
                 </label>
                 <select
+                  id="paymentMethod"
+                  name="paymentMethod"
                   value={payrollData.paymentMethod}
                   onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
                   className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -751,10 +756,12 @@ const Upload: React.FC = () => {
                 {payrollData.items.map((item, index) => (
                   <div key={index} className="grid grid-cols-1 md:grid-cols-4 gap-4 p-4 border border-border rounded-lg">
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <label htmlFor={`itemType-${index}`} className="block text-sm font-medium text-foreground mb-1">
                         {t('payroll.type')}
                       </label>
                       <select
+                        id={`itemType-${index}`}
+                        name={`itemType-${index}`}
                         value={item.item_type}
                         onChange={(e) => handleItemChange(index, 'item_type', e.target.value)}
                         className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -765,7 +772,7 @@ const Upload: React.FC = () => {
                     </div>
 
                     <div className="md:col-span-2">
-                      <label className="block text-sm font-medium text-foreground mb-1">
+                      <label htmlFor={`itemName-${index}`} className="block text-sm font-medium text-foreground mb-1">
                         {t('payroll.itemName')}
                       </label>
                       <PayrollItemSelector
@@ -777,10 +784,12 @@ const Upload: React.FC = () => {
 
                     <div className="flex items-end gap-2">
                       <div className="flex-1">
-                        <label className="block text-sm font-medium text-foreground mb-1">
+                        <label htmlFor={`itemAmount-${index}`} className="block text-sm font-medium text-foreground mb-1">
                           {t('payroll.amount')}
                         </label>
                         <input
+                          id={`itemAmount-${index}`}
+                          name={`itemAmount-${index}`}
                           type="number"
                           value={item.amount}
                           onChange={(e) => handleItemChange(index, 'amount', parseFloat(e.target.value) || 0)}
