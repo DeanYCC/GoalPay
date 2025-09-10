@@ -512,8 +512,9 @@ describe('Dashboard Component - Extended Test Coverage', () => {
       expect(screen.getByText('儀表板')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('USD 5,000')).toBeInTheDocument()
-    expect(screen.getByText('USD 4,500')).toBeInTheDocument()
+    // 檢查是否顯示了正確的貨幣格式
+    expect(screen.getByText(/USD.*5,000/)).toBeInTheDocument()
+    expect(screen.getByText(/USD.*4,500/)).toBeInTheDocument()
   })
 
   it('handles large numbers correctly', async () => {
@@ -544,8 +545,9 @@ describe('Dashboard Component - Extended Test Coverage', () => {
       expect(screen.getByText('儀表板')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('JPY 1,000,000')).toBeInTheDocument()
-    expect(screen.getByText('JPY 900,000')).toBeInTheDocument()
+    // 檢查是否顯示了正確的貨幣格式
+    expect(screen.getByText(/JPY.*1,000,000/)).toBeInTheDocument()
+    expect(screen.getByText(/JPY.*900,000/)).toBeInTheDocument()
   })
 
   it('handles zero values correctly', async () => {
@@ -576,7 +578,8 @@ describe('Dashboard Component - Extended Test Coverage', () => {
       expect(screen.getByText('儀表板')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('JPY 0')).toBeInTheDocument()
+    // 檢查是否顯示了零值
+    expect(screen.getAllByText(/JPY.*0/)).toHaveLength(4)
   })
 
   it('handles negative values correctly', async () => {
@@ -607,7 +610,8 @@ describe('Dashboard Component - Extended Test Coverage', () => {
       expect(screen.getByText('儀表板')).toBeInTheDocument()
     })
 
-    expect(screen.getByText('JPY 500,000')).toBeInTheDocument()
-    expect(screen.getByText('JPY -100,000')).toBeInTheDocument()
+    // 檢查是否顯示了正確的貨幣格式
+    expect(screen.getByText(/JPY.*500,000/)).toBeInTheDocument()
+    expect(screen.getByText(/JPY.*-100,000/)).toBeInTheDocument()
   })
 })

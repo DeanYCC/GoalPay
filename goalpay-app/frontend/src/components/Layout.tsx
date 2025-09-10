@@ -24,7 +24,7 @@ const Layout: React.FC = () => {
   console.log('Layout: 用戶已登入，渲染主界面');
 
   return (
-    <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`}>
+    <div className={`min-h-screen ${theme === 'dark' ? 'dark' : ''}`} data-testid="layout-container">
       <div className="flex h-screen bg-background">
         {/* 側邊欄 */}
         <Sidebar />

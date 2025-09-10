@@ -25,15 +25,25 @@ const StatsCard: React.FC<StatsCardProps> = ({
       // 確保有有效的貨幣代碼
       const validCurrency = currency && currency.trim() !== '' ? currency : 'JPY';
       
-      return new Intl.NumberFormat('ja-JP', {
-        style: 'currency',
-        currency: validCurrency,
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(amount)
+      try {
+        return new Intl.NumberFormat('ja-JP', {
+          style: 'currency',
+          currency: validCurrency,
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0,
+        }).format(amount)
+      } catch (error) {
+        // 如果 Intl.NumberFormat 失敗，使用簡單格式化
+        const formattedNumber = amount.toLocaleString('ja-JP')
+        return `${validCurrency} ${formattedNumber}`
+      }
     } else {
       // 非貨幣值，直接格式化數字
-      return new Intl.NumberFormat('ja-JP').format(amount)
+      try {
+        return new Intl.NumberFormat('ja-JP').format(amount)
+      } catch (error) {
+        return amount.toLocaleString('ja-JP')
+      }
     }
   }
 
