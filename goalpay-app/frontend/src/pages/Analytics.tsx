@@ -11,22 +11,69 @@ const Analytics: React.FC = () => {
   const [selectedPeriod, setSelectedPeriod] = useState('6m');
 
   // 獲取分析數據
-  const { data: analyticsData, isLoading } = useQuery({
+  const { data: analyticsData, isLoading, error } = useQuery({
     queryKey: ['analytics', selectedPeriod],
     queryFn: async () => {
       const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
+      console.log('Analytics data received:', response.data); // 添加調試日誌
       return response.data;
     },
     // 移除不必要的 enabled: true
     staleTime: 30000, // 添加緩存時間
   });
 
-  if (isLoading) {
+    if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">⚠️</div>
+          <p className="text-gray-600 dark:text-gray-400">載入數據時發生錯誤</p>
+          <p className="text-sm text-gray-500 mt-2">{error.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 驗證數據結構
+  if (!analyticsData || !analyticsData.taxHistory || !Array.isArray(analyticsData.taxHistory)) {
+    console.log('Analytics data validation failed:', analyticsData); // 添加調試日誌
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-gray-600 text-xl mb-4">📊</div>
+          <p className="text-gray-600 dark:text-gray-400">沒有可用的分析數據</p>
+          <p className="text-sm text-gray-500 mt-2">請檢查數據源或稍後再試</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 驗證稅收歷史數據的結構
+  const validTaxHistory = analyticsData.taxHistory.filter(item => 
+    item && typeof item.month === 'string' && 
+    typeof item.income === 'number' && 
+    typeof item.tax === 'number'
+  );
+
+  if (validTaxHistory.length === 0) {
+    console.log('No valid tax history data found:', analyticsData.taxHistory); // 添加調試日誌
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-gray-600 text-xl mb-4">📊</div>
+          <p className="text-gray-600 dark:text-gray-400">稅收歷史數據格式不正確</p>
+          <p className="text-sm text-gray-500 mt-2">請檢查數據格式或稍後再試</p>
         </div>
       </div>
     );
@@ -71,7 +118,7 @@ const Analytics: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.averageMonthlyIncome')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ¥{analyticsData?.summary?.totalIncome?.toLocaleString() || '0'}
+                ¥{analyticsData?.summary?.monthlyIncome?.toLocaleString() || '0'}
               </p>
             </div>
           </div>
@@ -85,7 +132,7 @@ const Analytics: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.growthRate')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                +{analyticsData?.summary?.monthlyGrowth || '0'}%
+                +{analyticsData?.summary?.growthRate || '0'}%
               </p>
             </div>
           </div>
@@ -99,7 +146,7 @@ const Analytics: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.averageDeductions')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                ¥{analyticsData?.summary?.totalDeductions?.toLocaleString() || '0'}
+                ¥{analyticsData?.summary?.monthlyDeductions?.toLocaleString() || '0'}
               </p>
             </div>
           </div>
@@ -113,7 +160,7 @@ const Analytics: React.FC = () => {
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{t('analytics.dataPoints')}</p>
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                {analyticsData?.taxHistory?.length || '0'}
+                {validTaxHistory.length}
               </p>
             </div>
           </div>
@@ -128,12 +175,40 @@ const Analytics: React.FC = () => {
             {t('analytics.incomeTrend')}
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={analyticsData?.taxHistory || []}>
+            <AreaChart data={validTaxHistory}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Area type="monotone" dataKey="income" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} name={t('payroll.income')} />
+              <XAxis 
+                dataKey="month" 
+                tickFormatter={(value) => {
+                  try {
+                    const date = new Date(value);
+                    return date.toLocaleDateString('ja-JP', { 
+                      year: 'numeric', 
+                      month: 'short' 
+                    });
+                  } catch {
+                    return value;
+                  }
+                }}
+              />
+              <YAxis 
+                tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}K`}
+              />
+              <Tooltip 
+                formatter={(value: number) => [`¥${value.toLocaleString()}`, t('income')]}
+                labelFormatter={(label) => {
+                  try {
+                    const date = new Date(label);
+                    return date.toLocaleDateString('ja-JP', { 
+                      year: 'numeric', 
+                      month: 'long' 
+                    });
+                  } catch {
+                    return label;
+                  }
+                }}
+              />
+              <Area type="monotone" dataKey="income" stroke="#8884d8" fill="#8884d8" fillOpacity={0.3} name={t('income')} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -144,12 +219,40 @@ const Analytics: React.FC = () => {
             {t('analytics.taxTrend')}
           </h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={analyticsData?.taxHistory || []}>
+            <LineChart data={validTaxHistory}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
-              <Line type="monotone" dataKey="tax" stroke="#82ca9d" strokeWidth={2} name={t('analytics.tax')} />
+              <XAxis 
+                dataKey="month" 
+                tickFormatter={(value) => {
+                  try {
+                    const date = new Date(value);
+                    return date.toLocaleDateString('ja-JP', { 
+                      year: 'numeric', 
+                      month: 'short' 
+                    });
+                  } catch {
+                    return value;
+                  }
+                }}
+              />
+              <YAxis 
+                tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}K`}
+              />
+              <Tooltip 
+                formatter={(value: number) => [`¥${value.toLocaleString()}`, t('tax')]}
+                labelFormatter={(label) => {
+                  try {
+                    const date = new Date(label);
+                    return date.toLocaleDateString('ja-JP', { 
+                      year: 'numeric', 
+                      month: 'long' 
+                    });
+                  } catch {
+                    return label;
+                  }
+                }}
+              />
+              <Line type="monotone" dataKey="tax" stroke="#82ca9d" strokeWidth={2} name={t('tax')} />
             </LineChart>
           </ResponsiveContainer>
         </div>
@@ -163,14 +266,42 @@ const Analytics: React.FC = () => {
             {t('analytics.incomeVsTax')}
           </h3>
           <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={analyticsData?.taxHistory || []}>
+            <BarChart data={validTaxHistory}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="month" />
-              <YAxis />
-              <Tooltip />
+              <XAxis 
+                dataKey="month" 
+                tickFormatter={(value) => {
+                  try {
+                    const date = new Date(value);
+                    return date.toLocaleDateString('ja-JP', { 
+                      year: 'numeric', 
+                      month: 'short' 
+                    });
+                  } catch {
+                    return value;
+                  }
+                }}
+              />
+              <YAxis 
+                tickFormatter={(value) => `¥${(value / 1000).toFixed(0)}K`}
+              />
+              <Tooltip 
+                formatter={(value: number) => [`¥${value.toLocaleString()}`, '']}
+                labelFormatter={(label) => {
+                  try {
+                    const date = new Date(label);
+                    return date.toLocaleDateString('ja-JP', { 
+                      year: 'numeric', 
+                      month: 'long' 
+                    });
+                  } catch {
+                    return label;
+                  }
+                }}
+              />
               <Legend />
-              <Bar dataKey="income" fill="#8884d8" name={t('payroll.income')} />
-              <Bar dataKey="tax" fill="#82ca9d" name={t('analytics.tax')} />
+              <Bar dataKey="income" fill="#8884d8" name={t('income')} />
+              <Bar dataKey="tax" fill="#82ca9d" name={t('tax')} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -184,9 +315,9 @@ const Analytics: React.FC = () => {
             <PieChart>
               <Pie
                 data={[
-                  { name: t('payrollItem.incomeTax'), value: 45000 },
-                  { name: t('payrollItem.healthInsurance'), value: 25000 },
-                  { name: t('payrollItem.pension'), value: 15000 },
+                  { name: t('incomeTax'), value: 45000 },
+                  { name: t('healthInsurance'), value: 25000 },
+                  { name: t('pension'), value: 15000 },
                 ]}
                 cx="50%"
                 cy="50%"

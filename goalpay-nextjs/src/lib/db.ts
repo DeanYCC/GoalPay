@@ -125,6 +125,54 @@ export async function getMonthlyBreakdown(userId: string, year: string) {
   return Object.values(monthlyData);
 }
 
+export async function getCustomDateRangeSummary(userId: string, startDate: string, endDate: string) {
+  const payrolls = await prisma.payroll.findMany({
+    where: { 
+      userId,
+      payrollDate: {
+        gte: new Date(startDate),
+        lte: new Date(endDate),
+      },
+    },
+    orderBy: { payrollDate: 'desc' },
+  });
+
+  const totalSalary = payrolls.reduce((sum, p) => sum + p.grossSalary, 0);
+  const totalDeductions = payrolls.reduce((sum, p) => sum + p.deductions + p.insurance + p.incomeTax, 0);
+  const netIncome = payrolls.reduce((sum, p) => sum + p.netPay, 0);
+
+  // 按月份分組數據
+  const monthlyData = payrolls.reduce((acc, payroll) => {
+    const month = new Date(payroll.payrollDate).toISOString().slice(0, 7); // YYYY-MM
+    if (!acc[month]) {
+      acc[month] = {
+        month,
+        payment: 0,
+        deduction: 0,
+        net: 0,
+      };
+    }
+    
+    acc[month].payment += payroll.grossSalary;
+    acc[month].deduction += payroll.deductions + payroll.insurance + payroll.incomeTax;
+    acc[month].net += payroll.netPay;
+    
+    return acc;
+  }, {} as Record<string, { month: string; payment: number; deduction: number; net: number }>);
+
+  return {
+    totalSalary,
+    totalDeductions,
+    netIncome,
+    count: payrolls.length,
+    monthlyData: Object.values(monthlyData),
+    dateRange: {
+      startDate,
+      endDate,
+    },
+  };
+}
+
 export async function getUserById(id: string) {
   return prisma.user.findUnique({
     where: { id },

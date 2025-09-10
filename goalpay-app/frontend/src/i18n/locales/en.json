@@ -142,7 +142,10 @@
     "overtime": "Overtime",
     "allowance": "Allowance",
     "payslipDetails": "Payslip Details",
-    "date": "Date"
+    "date": "Date",
+    "pleaseSelectBothDates": "Please select both start and end dates",
+    "startDateCannotBeAfterEndDate": "Start date cannot be after end date",
+    "endDateCannotBeInFuture": "End date cannot be in the future"
   },
   "settings": {
     "title": "Settings",

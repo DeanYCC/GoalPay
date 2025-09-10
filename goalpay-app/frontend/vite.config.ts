@@ -11,7 +11,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 3001, // 使用不同端口避免衝突
     host: true, // 允許網絡訪問
     proxy: {
       '/api': {

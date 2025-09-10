@@ -234,7 +234,7 @@ router.post('/export/pdf', async (req, res) => {
 // Export to CSV
 router.post('/export/csv', async (req, res) => {
   try {
-    const { startDate, endDate, includeCharts, includeTables } = req.query;
+    const { startDate, endDate, includeCharts, includeTables } = req.body;
     const userId = req.user.id;
 
     const whereClause = { userId };

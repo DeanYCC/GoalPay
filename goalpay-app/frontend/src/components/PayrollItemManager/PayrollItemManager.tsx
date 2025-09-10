@@ -17,9 +17,17 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
   const handleAddCustom = () => {
     const newItem: PayrollItemTemplate = {
       id: `custom_${Date.now()}`,
-      name: '',
+      name: {
+        zh: '',
+        en: '',
+        jp: ''
+      },
       type: 'income',
-      category: t('payrollItem.customCategory'),
+      category: {
+        zh: t('payrollItem.customCategory'),
+        en: 'Custom Items',
+        jp: 'カスタム項目'
+      },
       isDefault: false,
       isCustom: true,
       description: {
@@ -44,7 +52,7 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
   };
 
   const handleSave = () => {
-    if (editingItem && editingItem.name.trim()) {
+    if (editingItem && (typeof editingItem.name === 'string' ? editingItem.name.trim() : editingItem.name.zh.trim())) {
       if (editingItem.isCustom) {
         // 新增自訂項目
         setItems([...items, editingItem]);
@@ -170,8 +178,13 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
                     id="itemName"
                     name="itemName"
                     type="text"
-                    value={editingItem.name}
-                    onChange={(e) => setEditingItem({...editingItem, name: e.target.value})}
+                    value={typeof editingItem.name === 'string' ? editingItem.name : editingItem.name.zh}
+                    onChange={(e) => setEditingItem({
+                      ...editingItem, 
+                      name: typeof editingItem.name === 'string' 
+                        ? e.target.value 
+                        : { ...editingItem.name, zh: e.target.value }
+                    })}
                     className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                     required
                   />
@@ -198,8 +211,13 @@ const PayrollItemManager: React.FC<PayrollItemManagerProps> = ({ onSave }) => {
                   id="itemCategory"
                   name="itemCategory"
                   type="text"
-                  value={editingItem.category}
-                  onChange={(e) => setEditingItem({...editingItem, category: e.target.value})}
+                  value={typeof editingItem.category === 'string' ? editingItem.category : editingItem.category.zh}
+                  onChange={(e) => setEditingItem({
+                    ...editingItem, 
+                    category: typeof editingItem.category === 'string' 
+                      ? e.target.value 
+                      : { ...editingItem.category, zh: e.target.value }
+                  })}
                   className="w-full px-3 py-2 border border-border rounded-lg bg-background text-foreground"
                 />
               </div>

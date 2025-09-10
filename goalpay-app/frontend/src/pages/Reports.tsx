@@ -81,16 +81,21 @@ const Reports: React.FC = () => {
   const { startDate, endDate } = getDateRange();
 
   // 獲取報告數據
-  const { data: reportsData, isLoading, refetch } = useQuery({
+  const { data: reportsData, isLoading, refetch, error } = useQuery({
     queryKey: ['reports', selectedPeriod, startDate, endDate],
     queryFn: async () => {
       try {
+        console.log('Fetching reports data:', { selectedPeriod, startDate, endDate }); // 添加調試日誌
+        
         // 如果有自訂日期範圍，使用報告 API
         if (selectedPeriod === 'custom' && customStartDate && customEndDate) {
+          console.log('Using custom date range API:', { customStartDate, customEndDate }); // 添加調試日誌
           const response = await axios.get(API_ENDPOINTS.REPORTS.CUSTOM_RANGE(customStartDate, customEndDate));
+          console.log('Custom range API response:', response.data); // 添加調試日誌
           return response.data;
         } else {
           // 否則使用儀表板測試數據
+          console.log('Using dashboard test data API'); // 添加調試日誌
           const response = await axios.get(API_ENDPOINTS.DASHBOARD.TEST_DATA);
           return response.data;
         }
@@ -107,6 +112,15 @@ const Reports: React.FC = () => {
   // 當自訂日期改變時重新獲取數據
   useEffect(() => {
     if (selectedPeriod === 'custom' && customStartDate && customEndDate) {
+      const isValid = validateCustomDateRange();
+      console.log('Custom date validation result:', isValid); // 添加調試日誌
+      if (isValid) {
+        console.log('Refetching data for custom period:', { customStartDate, customEndDate }); // 添加調試日誌
+        refetch();
+      }
+    } else if (selectedPeriod !== 'custom') {
+      // 當選擇非自訂區間時，也要重新獲取數據
+      console.log('Refetching data for period:', selectedPeriod); // 添加調試日誌
       refetch();
     }
   }, [customStartDate, customEndDate, selectedPeriod, refetch]);
@@ -117,6 +131,18 @@ const Reports: React.FC = () => {
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600 dark:text-gray-400">{t('common.loading')}</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="text-red-600 text-xl mb-4">⚠️</div>
+          <p className="text-gray-600 dark:text-gray-400">載入報告數據時發生錯誤</p>
+          <p className="text-sm text-gray-500 mt-2">{error.message}</p>
         </div>
       </div>
     );
@@ -140,7 +166,16 @@ const Reports: React.FC = () => {
         <div className="flex space-x-3">
           <select
             value={selectedPeriod}
-            onChange={(e) => setSelectedPeriod(e.target.value)}
+            onChange={(e) => {
+              const newPeriod = e.target.value;
+              setSelectedPeriod(newPeriod);
+              // 如果選擇自訂區間，自動顯示詳細設定面板
+              if (newPeriod === 'custom') {
+                setShowAdvancedSettings(true);
+              } else {
+                setShowAdvancedSettings(false);
+              }
+            }}
             className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white"
           >
             <option value="1m">{t('periods.1m')}</option>
@@ -149,15 +184,6 @@ const Reports: React.FC = () => {
             <option value="1y">{t('periods.1y')}</option>
             <option value="custom">{t('reports.customPeriod')}</option>
           </select>
-          
-          <button 
-            onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
-            className="flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-          >
-            <Settings className="w-4 h-4 mr-2" />
-            {t('reports.advancedSettings')}
-            {showAdvancedSettings ? <ChevronUp className="w-4 h-4 ml-2" /> : <ChevronDown className="w-4 h-4 ml-2" />}
-          </button>
           
           <button className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors">
             <Download className="w-4 h-4 mr-2" />
@@ -214,8 +240,11 @@ const Reports: React.FC = () => {
                       // 修正：選擇6月時，應該顯示6/1-6/30
                       const startDate = new Date(selectedYear, selectedMonth - 1, 1);
                       const endDate = new Date(selectedYear, selectedMonth, 0); // 這個會得到當月的最後一天
-                      setCustomStartDate(startDate.toISOString().split('T')[0]);
-                      setCustomEndDate(endDate.toISOString().split('T')[0]);
+                      const startDateStr = startDate.toISOString().split('T')[0];
+                      const endDateStr = endDate.toISOString().split('T')[0];
+                      console.log('Setting custom dates:', { startDateStr, endDateStr }); // 添加調試日誌
+                      setCustomStartDate(startDateStr);
+                      setCustomEndDate(endDateStr);
                       setSelectedPeriod('custom');
                     }}
                     className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
@@ -236,8 +265,10 @@ const Reports: React.FC = () => {
                         type="date"
                         value={customStartDate}
                         onChange={(e) => {
-                          setCustomStartDate(e.target.value);
-                          if (e.target.value && customEndDate) {
+                          const newStartDate = e.target.value;
+                          setCustomStartDate(newStartDate);
+                          console.log('Start date changed:', newStartDate); // 添加調試日誌
+                          if (newStartDate && customEndDate) {
                             setSelectedPeriod('custom');
                             validateCustomDateRange();
                           }
@@ -255,8 +286,10 @@ const Reports: React.FC = () => {
                         type="date"
                         value={customEndDate}
                         onChange={(e) => {
-                          setCustomEndDate(e.target.value);
-                          if (customStartDate && e.target.value) {
+                          const newEndDate = e.target.value;
+                          setCustomEndDate(newEndDate);
+                          console.log('End date changed:', newEndDate); // 添加調試日誌
+                          if (customStartDate && newEndDate) {
                             setSelectedPeriod('custom');
                             validateCustomDateRange();
                           }
@@ -294,6 +327,9 @@ const Reports: React.FC = () => {
                   <p className="text-sm text-blue-700 dark:text-blue-300">
                     {t('reports.currentSelection')}：{customStartDate} {t('reports.to')} {customEndDate}
                   </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                    數據點數：{reportsData?.recentPayrolls?.length || 0}
+                  </p>
                 </div>
               )}
             </div>
@@ -311,6 +347,11 @@ const Reports: React.FC = () => {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 ¥{reportsData?.summary?.totalIncome?.toLocaleString() || '0'}
               </p>
+              {selectedPeriod === 'custom' && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {customStartDate} - {customEndDate}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -325,6 +366,11 @@ const Reports: React.FC = () => {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 ¥{reportsData?.summary?.netIncome?.toLocaleString() || '0'}
               </p>
+              {selectedPeriod === 'custom' && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {customStartDate} - {customEndDate}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -339,6 +385,11 @@ const Reports: React.FC = () => {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 ¥{reportsData?.summary?.totalDeductions?.toLocaleString() || '0'}
               </p>
+              {selectedPeriod === 'custom' && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {customStartDate} - {customEndDate}
+                </p>
+              )}
             </div>
           </div>
         </div>
@@ -353,6 +404,11 @@ const Reports: React.FC = () => {
               <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {reportsData?.recentPayrolls?.length || '0'}
               </p>
+              {selectedPeriod === 'custom' && (
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {customStartDate} - {customEndDate}
+                </p>
+              )}
             </div>
           </div>
         </div>

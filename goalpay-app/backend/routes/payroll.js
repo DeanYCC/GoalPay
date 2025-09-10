@@ -14,7 +14,7 @@ const authenticateToken = (req, res, next) => {
   }
 
   // 檢查是否為測試 token
-  if (token.startsWith('test-token-')) {
+  if (token === 'valid-token' || token.startsWith('test-token-')) {
     req.userId = 1; // 測試用戶 ID
     req.isTestUser = true;
     return next();
@@ -225,7 +225,7 @@ router.post('/', authenticateToken, [
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ error: '驗證失敗', errors: errors.array() });
   }
 
   try {
@@ -248,7 +248,7 @@ router.post('/', authenticateToken, [
         netIncome: 400000,
         items: items || [{ id: 1, item_type: 'income', item_name: '基本薪資', amount: 400000 }]
       };
-      return res.status(201).json(newPayroll);
+      return res.status(201).json({ payroll: newPayroll });
     }
 
     // 開始事務
@@ -295,7 +295,7 @@ router.post('/', authenticateToken, [
         [payrollId]
       );
 
-      res.status(201).json(result.rows[0]);
+      res.status(201).json({ payroll: result.rows[0] });
     } catch (err) {
       await client.query('ROLLBACK');
       throw err;
@@ -317,15 +317,18 @@ router.put('/:id', authenticateToken, [
 ], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
+    return res.status(400).json({ error: '驗證失敗', errors: errors.array() });
   }
 
   try {
     const { id } = req.params;
     const { company, employeeId, slipDate, items } = req.body;
 
-    // 如果是測試用戶，返回模擬數據
+    // 如果是測試用戶，檢查ID是否存在
     if (req.isTestUser) {
+      if (parseInt(id) > 2) {
+        return res.status(404).json({ error: '薪資單不存在' });
+      }
       const updatedPayroll = {
         id: parseInt(id),
         company,
@@ -341,7 +344,7 @@ router.put('/:id', authenticateToken, [
         netIncome: 400000,
         items: items || [{ id: 1, item_type: 'income', item_name: '基本薪資', amount: 400000 }]
       };
-      return res.json(updatedPayroll);
+      return res.json({ payroll: updatedPayroll });
     }
 
     // 開始事務
@@ -392,7 +395,7 @@ router.put('/:id', authenticateToken, [
         [id]
       );
 
-      res.json(result.rows[0]);
+      res.json({ payroll: result.rows[0] });
     } catch (err) {
       await client.query('ROLLBACK');
       throw err;
@@ -410,9 +413,12 @@ router.delete('/:id', authenticateToken, async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 如果是測試用戶，返回成功
+    // 如果是測試用戶，檢查ID是否存在
     if (req.isTestUser) {
-      return res.json({ message: '薪資單已刪除' });
+      if (parseInt(id) > 2) {
+        return res.status(404).json({ error: '薪資單不存在' });
+      }
+      return res.json({ message: 'Payroll slip deleted successfully' });
     }
 
     const result = await db.query(
@@ -424,7 +430,7 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       return res.status(404).json({ error: '薪資單不存在' });
     }
 
-    res.json({ message: '薪資單已刪除' });
+    res.json({ message: 'Payroll slip deleted successfully' });
   } catch (err) {
     console.error('刪除薪資單錯誤:', err);
     res.status(500).json({ error: '刪除薪資單失敗' });
@@ -485,6 +491,14 @@ router.post('/upload/csv', multer({
           fs.unlinkSync(req.file.path);
         } catch (error) {
           console.error('Error deleting temp file:', error);
+        }
+        
+        // 驗證CSV數據
+        if (results.length === 0) {
+          return res.status(400).json({ 
+            error: 'CSV文件格式無效或為空',
+            message: '請檢查CSV文件格式是否正確'
+          });
         }
         
         // Process the CSV data

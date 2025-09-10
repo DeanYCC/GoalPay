@@ -126,32 +126,32 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatsCard
           title={t('dashboard.totalIncome')}
-          value={summary.totalIncome || 0}
-          currency={summary.currency || 'JPY'}
-          trend={summary.monthlyGrowth || 0}
+          value={summary?.totalIncome || 0}
+          currency={summary?.currency || 'JPY'}
+          trend={summary?.monthlyGrowth || 0}
           icon="dollar-sign"
           color="green"
         />
         <StatsCard
           title={t('dashboard.totalDeductions')}
-          value={summary.totalDeductions || 0}
-          currency={summary.currency || 'JPY'}
+          value={summary?.totalDeductions || 0}
+          currency={summary?.currency || 'JPY'}
           trend={0}
           icon="trending-down"
           color="red"
         />
         <StatsCard
           title={t('dashboard.netIncome')}
-          value={summary.netIncome || 0}
-          currency={summary.currency || 'JPY'}
-          trend={summary.monthlyGrowth || 0}
+          value={summary?.netIncome || 0}
+          currency={summary?.currency || 'JPY'}
+          trend={summary?.monthlyGrowth || 0}
           icon="trending-up"
           color="blue"
         />
         <StatsCard
           title={t('dashboard.monthlyAverage')}
-          value={summary.monthlyAverage || 0}
-          currency={summary.currency || 'JPY'}
+          value={summary?.monthlyAverage || 0}
+          currency={summary?.currency || 'JPY'}
           trend={0}
           icon="calendar"
           color="purple"

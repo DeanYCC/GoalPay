@@ -13,6 +13,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const payrollRoutes = require('./routes/payroll');
 const dashboardRoutes = require('./routes/dashboard');
+const reportsRoutes = require('./routes/reports');
 const companyRoutes = require('./routes/companies');
 const supportRoutes = require('./routes/support');
 const adminRoutes = require('./routes/admin');
@@ -23,7 +24,7 @@ const PORT = process.env.PORT || 5001;
 // 安全中間件
 app.use(helmet());
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: process.env.FRONTEND_URL || 'http://localhost:3001',
   credentials: true
 }));
 
@@ -58,6 +59,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/reports', reportsRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/support', supportRoutes);
 app.use('/api/admin', adminRoutes);

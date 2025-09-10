@@ -121,6 +121,18 @@ const PayrollDetail: React.FC = () => {
     },
   });
 
+  // 刪除薪資單
+  const deletePayrollMutation = useMutation({
+    mutationFn: async () => {
+      const response = await axios.delete(API_ENDPOINTS.PAYROLL.DELETE(id));
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['payrolls'] });
+      navigate('/payroll');
+    },
+  });
+
   const handleSave = () => {
     if (payrollData) {
       updatePayrollMutation.mutate(payrollData);
@@ -225,13 +237,27 @@ const PayrollDetail: React.FC = () => {
         
         <div className="flex space-x-3">
           {!isEditing ? (
-            <button
-              onClick={() => setIsEditing(true)}
-              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-            >
-              <Edit className="w-4 h-4 mr-2" />
-              編輯
-            </button>
+            <>
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+              >
+                <Edit className="w-4 h-4 mr-2" />
+                編輯
+              </button>
+              <button
+                onClick={() => {
+                  if (window.confirm('確定要刪除這筆薪資單嗎？此操作無法復原。')) {
+                    deletePayrollMutation.mutate();
+                  }
+                }}
+                disabled={deletePayrollMutation.isLoading}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                <Trash2 className="w-4 h-4 mr-2" />
+                刪除
+              </button>
+            </>
           ) : (
             <>
               <button
