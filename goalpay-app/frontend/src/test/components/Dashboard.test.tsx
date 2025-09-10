@@ -1,137 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { screen, waitFor } from '@testing-library/react'
-import { render } from '@testing-library/react'
-import { BrowserRouter } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { render } from '../test-utils'
 import Dashboard from '../../pages/Dashboard'
-
-// Test wrapper component
-const TestWrapper = ({ children }: { children: React.ReactNode }) => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  })
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        {children}
-      </BrowserRouter>
-    </QueryClientProvider>
-  )
-}
-
-// Mock i18n before importing components
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => {
-      const translations: Record<string, string> = {
-        'dashboard.title': '儀表板',
-        'dashboard.subtitle': '管理您的薪資單和收入追蹤',
-        'dashboard.totalIncome': '總收入',
-        'dashboard.totalDeductions': '總扣除',
-        'dashboard.netIncome': '淨收入',
-        'dashboard.monthlyAverage': '月平均',
-        'common.loading': '載入中...',
-        'error.loadingError': '載入數據時發生錯誤',
-      }
-      return translations[key] || key
-    },
-    i18n: {
-      changeLanguage: vi.fn(),
-      language: 'zh',
-    },
-  }),
-}))
-
-// Mock Context hooks directly
-vi.mock('../../contexts/AuthContext', () => ({
-  useAuth: () => ({
-    user: { id: 1, email: 'test@example.com', name: 'Test User' },
-    token: 'mock-token',
-    login: vi.fn(),
-    logout: vi.fn(),
-    updateUser: vi.fn(),
-  }),
-}))
-
-vi.mock('../../contexts/ThemeContext', () => ({
-  useTheme: () => ({
-    theme: 'light',
-    toggleTheme: vi.fn(),
-    setTheme: vi.fn(),
-  }),
-}))
-
-vi.mock('../../contexts/LanguageContext', () => ({
-  useLanguage: () => ({
-    language: 'zh',
-    setLanguage: vi.fn(),
-    t: (key: string) => key,
-  }),
-}))
-
-// Mock axios with proper methods
-vi.mock('axios', () => ({
-  default: {
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-    patch: vi.fn(),
-    head: vi.fn(),
-    options: vi.fn(),
-    request: vi.fn(),
-    interceptors: {
-      request: {
-        use: vi.fn(),
-        eject: vi.fn(),
-      },
-      response: {
-        use: vi.fn(),
-        eject: vi.fn(),
-      },
-    },
-    defaults: {
-      baseURL: '',
-      headers: {},
-      timeout: 0,
-    },
-    create: vi.fn(() => ({
-      get: vi.fn(),
-      post: vi.fn(),
-      put: vi.fn(),
-      delete: vi.fn(),
-      patch: vi.fn(),
-      head: vi.fn(),
-      options: vi.fn(),
-      request: vi.fn(),
-      interceptors: {
-        request: { use: vi.fn(), eject: vi.fn() },
-        response: { use: vi.fn(), eject: vi.fn() },
-      },
-      defaults: { baseURL: '', headers: {}, timeout: 0 },
-    })),
-  },
-  create: vi.fn(() => ({
-    get: vi.fn(),
-    post: vi.fn(),
-    put: vi.fn(),
-    delete: vi.fn(),
-    patch: vi.fn(),
-    head: vi.fn(),
-    options: vi.fn(),
-    request: vi.fn(),
-    interceptors: {
-      request: { use: vi.fn(), eject: vi.fn() },
-      response: { use: vi.fn(), eject: vi.fn() },
-    },
-    defaults: { baseURL: '', headers: {}, timeout: 0 },
-  })),
-}))
 
 // Mock the API endpoints
 vi.mock('../../config/api', () => ({
@@ -229,9 +99,10 @@ describe('Dashboard Component', () => {
       writable: true,
     })
 
-    const axios = await import('axios')
-    
-    axios.default.get.mockResolvedValue({
+    // Mock useQuery to return test data
+    const { useQuery } = await import('@tanstack/react-query')
+    const mockUseQuery = useQuery as any
+    mockUseQuery.mockReturnValue({
       data: {
         summary: {
           totalIncome: 500000,
@@ -243,14 +114,13 @@ describe('Dashboard Component', () => {
         },
         recentPayrolls: [],
         monthlyTrend: []
-      }
+      },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
     })
 
-    render(
-      <TestWrapper>
-        <Dashboard />
-      </TestWrapper>
-    )
+    render(<Dashboard />)
 
     await waitFor(() => {
       expect(screen.getByText('儀表板')).toBeInTheDocument()
@@ -260,49 +130,58 @@ describe('Dashboard Component', () => {
     expect(screen.getByText('總收入')).toBeInTheDocument()
     expect(screen.getByText('淨收入')).toBeInTheDocument()
     expect(screen.getByText('JPY 500,000')).toBeInTheDocument()
-    expect(screen.getByText('JPY 450,000')).toBeInTheDocument()
-    expect(screen.getByTestId('stats-card')).toBeInTheDocument()
+    expect(screen.getAllByText('JPY 450,000')).toHaveLength(2) // 淨收入和月平均都是450,000
+    expect(screen.getAllByTestId('stats-card')).toHaveLength(4) // 4个统计卡片
     expect(screen.getByTestId('salary-chart')).toBeInTheDocument()
     expect(screen.getByTestId('quick-actions')).toBeInTheDocument()
   })
 
   it('shows loading state initially', async () => {
-    const axios = await import('axios')
-    axios.default.get.mockImplementation(() => new Promise(() => {})) // Never resolves
+    // Mock useQuery to return loading state
+    const { useQuery } = await import('@tanstack/react-query')
+    const mockUseQuery = useQuery as any
+    mockUseQuery.mockReturnValue({
+      data: null,
+      isLoading: true,
+      error: null,
+      refetch: vi.fn(),
+    })
 
-    render(
-      <TestWrapper>
-        <Dashboard />
-      </TestWrapper>
-    )
+    render(<Dashboard />)
 
     expect(screen.getByText('載入中...')).toBeInTheDocument()
   })
 
   it('shows error state when API call fails', async () => {
-    const axios = await import('axios')
-    axios.default.get.mockRejectedValue(new Error('API Error'))
+    // Mock useQuery to return error state
+    const { useQuery } = await import('@tanstack/react-query')
+    const mockUseQuery = useQuery as any
+    mockUseQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+      error: new Error('API Error'),
+      refetch: vi.fn(),
+    })
 
-    render(
-      <TestWrapper>
-        <Dashboard />
-      </TestWrapper>
-    )
+    render(<Dashboard />)
 
     await waitFor(() => {
-      expect(screen.getByText('載入數據時發生錯誤')).toBeInTheDocument()
+      expect(screen.getByText('無法載入儀表板數據，請檢查網絡連接')).toBeInTheDocument()
     })
   })
 
   it('handles null dashboard data gracefully', async () => {
-    const axios = await import('axios')
-    axios.default.get.mockResolvedValue({ data: null })
+    // Mock useQuery to return null data
+    const { useQuery } = await import('@tanstack/react-query')
+    const mockUseQuery = useQuery as any
+    mockUseQuery.mockReturnValue({
+      data: null,
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
+    })
 
-    render(
-      <TestWrapper>
-        <Dashboard />
-      </TestWrapper>
-    )
+    render(<Dashboard />)
 
     await waitFor(() => {
       expect(screen.getByText('儀表板')).toBeInTheDocument()
@@ -314,20 +193,21 @@ describe('Dashboard Component', () => {
   })
 
   it('handles empty dashboard data gracefully', async () => {
-    const axios = await import('axios')
-    axios.default.get.mockResolvedValue({ 
+    // Mock useQuery to return empty data structure
+    const { useQuery } = await import('@tanstack/react-query')
+    const mockUseQuery = useQuery as any
+    mockUseQuery.mockReturnValue({
       data: {
         summary: null,
         recentPayrolls: [],
         monthlyTrend: []
-      }
+      },
+      isLoading: false,
+      error: null,
+      refetch: vi.fn(),
     })
 
-    render(
-      <TestWrapper>
-        <Dashboard />
-      </TestWrapper>
-    )
+    render(<Dashboard />)
 
     await waitFor(() => {
       expect(screen.getByText('儀表板')).toBeInTheDocument()

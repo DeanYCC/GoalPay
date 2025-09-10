@@ -170,16 +170,7 @@ vi.mock('react-router-dom', async () => {
   }
 })
 
-// Mock react-i18next
-vi.mock('react-i18next', () => ({
-  useTranslation: () => ({
-    t: (key: string) => key,
-    i18n: {
-      changeLanguage: vi.fn(),
-      language: 'en',
-    },
-  }),
-}))
+// Clean up after each test - keeping only the complete i18n mock above
 
 // Mock @tanstack/react-query
 vi.mock('@tanstack/react-query', () => ({
