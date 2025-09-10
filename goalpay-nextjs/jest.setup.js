@@ -2,8 +2,15 @@ import '@testing-library/jest-dom'
 
 // Mock Web APIs for Next.js
 global.Request = class Request {
-  constructor(input, init) {
-    this.url = input
+  constructor(input, init = {}) {
+    // Use Object.defineProperty to properly set url as a getter
+    Object.defineProperty(this, 'url', {
+      value: input,
+      writable: false,
+      enumerable: true,
+      configurable: false
+    })
+    
     this.method = init?.method || 'GET'
     this.headers = new Map(Object.entries(init?.headers || {}))
     this.body = init?.body
@@ -25,6 +32,18 @@ global.Response = class Response {
   async json() {
     return JSON.parse(this.body || '{}')
   }
+  
+  // Static method for NextResponse.json
+  static json(data, init = {}) {
+    return new Response(JSON.stringify(data), {
+      status: init.status || 200,
+      statusText: init.statusText || 'OK',
+      headers: {
+        'Content-Type': 'application/json',
+        ...init.headers
+      }
+    })
+  }
 }
 
 global.Headers = class Headers {
@@ -40,12 +59,33 @@ global.Headers = class Headers {
     this.map.set(name.toLowerCase(), value)
   }
   
+  append(name, value) {
+    const existing = this.map.get(name.toLowerCase())
+    if (existing) {
+      this.map.set(name.toLowerCase(), existing + ', ' + value)
+    } else {
+      this.map.set(name.toLowerCase(), value)
+    }
+  }
+  
   has(name) {
     return this.map.has(name.toLowerCase())
   }
   
   delete(name) {
     this.map.delete(name.toLowerCase())
+  }
+  
+  entries() {
+    return this.map.entries()
+  }
+  
+  keys() {
+    return this.map.keys()
+  }
+  
+  values() {
+    return this.map.values()
   }
 }
 
